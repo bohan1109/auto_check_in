@@ -3,11 +3,12 @@ from fastapi import FastAPI
 from config import DatabaseConfig
 
 client: AsyncIOMotorClient = None
+db = None
 
 async def connect_to_mongo(app: FastAPI):
-    global client
+    global client, db
     client = AsyncIOMotorClient(DatabaseConfig.MONGODB_URL)
-    app.mongodb = client[DatabaseConfig.DATABASE_NAME]
+    db = client[DatabaseConfig.DATABASE_NAME]
     print("Successfully connected to MongoDB!")
 
 async def close_mongo_connection(app: FastAPI):
