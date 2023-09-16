@@ -1,13 +1,19 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from services import admins as admins_service
+from services import admins as AdminServiceModule
 from models import admins as admins_model
-from fastapi import HTTPException
+from fastapi import HTTPException,Depends
 router = APIRouter()
 
+
+def get_admins_service() -> AdminServiceModule.AdminService:
+    return AdminServiceModule.AdminService()
+
+
 @router.get("/{admin_id}")
-async def read_admin(admin_id: str):
+async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
     try:
+        # admins_service = get_admins_service()
         admin_data =await admins_service.fetch_admin(admin_id)
         if admin_data is None:
             raise HTTPException(status_code=404, detail="Data not found")
@@ -21,9 +27,10 @@ async def read_admin(admin_id: str):
         # raise HTTPException(content={"message":"Server error"},status_code=500)
 
 @router.post("/")
-async def create_admin(admin: admins_model.AdminCreate):
+async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
     try:
-        await admins_service.create_admin_to_service(admin)
+        # admins_service = get_admins_service()
+        await admins_service.create_admin(admin)
         return {"detail": "success"}
     except ValueError as ve:  # For data validation errors
         raise HTTPException(status_code=400, detail=str(ve))
@@ -36,9 +43,10 @@ async def create_admin(admin: admins_model.AdminCreate):
         # raise HTTPException(content={"message":"Server error"},status_code=500)
         
 @router.patch("/{admin_id}")
-async def update_admin(admin_id: str,admin: admins_model.AdminUpdate):
+async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
     try:
-        await admins_service.update_admin_to_service(admin_id,admin)
+        # admins_service = get_admins_service()
+        await admins_service.update_admin(admin_id,admin)
         return {"detail": "success"}
     except ValueError as ve:  # For data validation errors
         raise HTTPException(status_code=400, detail=str(ve))
