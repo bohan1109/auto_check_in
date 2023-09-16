@@ -75,3 +75,15 @@ class AdminDB:
             return admin
         else:
             raise ValueError("Admin could not be updated")
+        
+    async def delete_admin(self,admin_id:str):
+        collection = self.db.admins
+        
+        result = await collection.delete_one(
+            {"_id": ObjectId(admin_id)}
+        )
+
+        if result.deleted_count > 0:
+            return {"message": "Admin successfully deleted."}
+        else:
+            raise ValueError("Admin could not be updated")

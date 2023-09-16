@@ -22,3 +22,7 @@ class AdminService:
     async def update_admin(self, admin_id: str, admin: admin_models.AdminUpdate):
         result = await self._admins_db.update_admin(admin_id, admin)
         return result
+    
+    async def delete_admin(self, admin_id: str):
+        result = await self._admins_db.delete_admin(admin_id)
+        return result
