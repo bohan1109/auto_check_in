@@ -29,3 +29,13 @@ class AdminUpdate(BaseModel):
         if 'password' in values and confirm_password != values['password']:
             raise ValueError("Password and Confirm Password do not match")
         return confirm_password
+    
+class AdminLogin(BaseModel):
+    account:str
+    password:str
+    
+    @validator("account", "password", pre=True)
+    def check_empty(cls, value):
+        if value is None or str(value).strip() == "":
+            raise ValueError("Data can not be empty")
+        return value

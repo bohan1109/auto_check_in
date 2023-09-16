@@ -1,6 +1,7 @@
 from db import admins as AdminDBModule
 from models import admins as admin_models
 from typing import Optional
+import bcrypt
 
 class AdminService:
     def __init__(self,admins_db: Optional[AdminDBModule.AdminDB] = None):
@@ -26,3 +27,14 @@ class AdminService:
     async def delete_admin(self, admin_id: str):
         result = await self._admins_db.delete_admin(admin_id)
         return result
+    
+    async def authenticate_admin(self, admin: admin_models.AdminLogin):
+        admin_data = await self._admins_db.read_admin_by_params("account",admin.account)
+        if not admin_data:
+            return False
+        stored_password = admin_data["password"]
+        password_bytes = admin.password.encode("utf-8")
+        if bcrypt.checkpw(password_bytes, stored_password):
+            return True
+        else:
+            return False
