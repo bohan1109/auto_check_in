@@ -2,12 +2,37 @@ from fastapi import APIRouter
 from services import admins as AdminServiceModule
 from models import admins as admins_model
 from fastapi import HTTPException,Depends
+from fastapi.security import OAuth2PasswordBearer
+from datetime import datetime, timedelta
 router = APIRouter()
 
 
 def get_admins_service() -> AdminServiceModule.AdminService:
     return AdminServiceModule.AdminService()
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+def get_current_admin(token: str = Depends(oauth2_scheme)) -> admins_model.TokenData:
+    try:
+        admin_service = AdminServiceModule.AdminService()
+        payload = admin_service.decode_jwt_token(token)
+    except admins_model.JWTError:
+        raise HTTPException(
+            status_code=401,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    username: str = payload.get("sub")
+    if username is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return admins_model.TokenData(username=username)
+
+        
+@router.get("/protected")
+async def read_protected_route(current_admin: admins_model.TokenData = Depends(get_current_admin)):
+    # 如果 token 是正確的，這個路由會被執行並回傳以下的字典
+    return {"username": current_admin.username, "message": "Welcome to a protected route!"}
 
 @router.get("/{admin_id}")
 async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
@@ -59,7 +84,8 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
     try:
         login_result = await admins_service.authenticate_admin(admin)
         if login_result:
-            return {"detail": "success"}
+            access_token = admins_service.create_access_token(data={"sub": admin.account})
+            return {"access_token": access_token, "token_type": "bearer"}
         else:
             raise HTTPException(detail="Account or password error",status_code=401)
     except ValueError as ve:  
@@ -69,3 +95,6 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
     except Exception as e:
         raise HTTPException(detail="Server error",status_code=500)
         # raise HTTPException(detail="Server error",status_code=500)
+
+        
+

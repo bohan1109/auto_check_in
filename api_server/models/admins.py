@@ -39,3 +39,13 @@ class AdminLogin(BaseModel):
         if value is None or str(value).strip() == "":
             raise ValueError("Data can not be empty")
         return value
+    
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+    
+class JWTError(Exception):
+    pass
