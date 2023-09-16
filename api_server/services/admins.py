@@ -17,11 +17,22 @@ class AdminService:
         have_account = await self._admins_db.read_admin_by_params("account", admin.account)
         if have_account:
             raise ValueError("Account already exist")
+        password_bytes = admin.password.encode("utf-8")
+        admin.password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
         result = await self._admins_db.create_admin(admin)
         return result
 
     async def update_admin(self, admin_id: str, admin: admin_models.AdminUpdate):
-        result = await self._admins_db.update_admin(admin_id, admin)
+        admin_data = {}
+    
+        if admin.password:
+            password_bytes = admin.password.encode("utf-8")
+            hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+            admin_data["password"] = hashed_password
+
+        if admin.username:
+            admin_data["username"] = admin.username
+        result = await self._admins_db.update_admin(admin_id, admin_data)
         return result
     
     async def delete_admin(self, admin_id: str):
@@ -34,7 +45,11 @@ class AdminService:
             return False
         stored_password = admin_data["password"]
         password_bytes = admin.password.encode("utf-8")
-        if bcrypt.checkpw(password_bytes, stored_password):
+        return self.authenticate_password(password_bytes,stored_password)
+        
+    @staticmethod
+    def authenticate_password(password: str, hashed_password: str) -> bool:
+        if bcrypt.checkpw(password, hashed_password):
             return True
         else:
             return False

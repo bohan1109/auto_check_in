@@ -41,12 +41,10 @@ class AdminDB:
         return admin_data
 
     async def create_admin(self, admin: AdminCreate):
-        password_bytes = admin.password.encode("utf-8")
-        hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
         collection = self.db.admins
         admin_data = {
             "account": admin.account,
-            "password": hashed_password,
+            "password": admin.password,
             "username": admin.username,
         }
         new_admin = await collection.insert_one(admin_data)
@@ -55,24 +53,15 @@ class AdminDB:
         else:
             raise ValueError("Admin could not be created")
 
-    async def update_admin(self, admin_id: str, admin: AdminUpdate):
+    async def update_admin(self, admin_id: str, admin_data: dict()):
         collection = self.db.admins
-        admin_data = {}
-
-        if admin.password:
-            password_bytes = admin.password.encode("utf-8")
-            hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
-            admin_data["password"] = hashed_password
-
-        if admin.username:
-            admin_data["username"] = admin.username
 
         result = await collection.update_one(
             {"_id": ObjectId(admin_id)}, {"$set": admin_data}
         )
 
         if result.modified_count > 0:
-            return admin
+            return admin_data
         else:
             raise ValueError("Admin could not be updated")
         

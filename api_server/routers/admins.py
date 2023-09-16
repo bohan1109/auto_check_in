@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 from services import admins as AdminServiceModule
 from models import admins as admins_model
 from fastapi import HTTPException,Depends
