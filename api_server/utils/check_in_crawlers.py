@@ -1,4 +1,4 @@
-import models
+from selenium.common.exceptions import NoSuchElementException
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from config import CrawlerConfig
 from selenium.common.exceptions import TimeoutException
 from models.check_in_accounts import CheckInAccountCreate
+import time
 
 class CheckInCrawler:
     def __init__(self) -> None:
@@ -34,6 +35,7 @@ class CheckInCrawler:
         except TimeoutException:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
             return False
+
     
     def login_result(self,check_in_account:CheckInAccountCreate):
         try:
@@ -47,6 +49,11 @@ class CheckInCrawler:
 
             login_button = self.driver.find_element(By.ID, 'button')
             login_button.click()
+            time.sleep(1)
+            error_message = self.driver.find_element(By.ID, 'msg').text
+            print(f"error_message: {error_message}")
+            if "帳號密碼錯誤" in error_message:
+                return False
 
             # 等待登入成功的指標元素出現
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-key="1"]')))
@@ -57,5 +64,15 @@ class CheckInCrawler:
         except TimeoutException:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
             return False
+        except NoSuchElementException:
+            print("Element not found!")
+            # 如果"msg"元素不存在，則可能是正常的登錄
+            pass
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return False
+        finally:
+            # 確保在操作結束後關閉瀏覽器
+            self.driver.quit()
     def close(self):
         self.driver.close()
