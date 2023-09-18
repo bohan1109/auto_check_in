@@ -2,10 +2,9 @@ from bson import ObjectId
 import db.connect as db_module
 from bson.errors import InvalidId
 from bson import ObjectId
-import bcrypt
 from typing import Optional
 from motor.motor_asyncio import AsyncIOMotorClient
-from models.admins import AdminCreate, AdminUpdate
+from models.admins import AdminCreate
 
 class AdminDB:
 

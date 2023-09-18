@@ -5,7 +5,6 @@ from config import JWTConfig
 import bcrypt
 import jwt
 from datetime import datetime, timedelta
-from fastapi.security import OAuth2PasswordBearer
 
 
 class AdminService:

@@ -3,7 +3,6 @@ from services import admins as AdminServiceModule
 from models import admins as admins_model
 from fastapi import HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
-from datetime import datetime, timedelta
 router = APIRouter()
 
 
@@ -53,6 +52,7 @@ async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminServi
 async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
     try:
         await admins_service.create_admin(admin)
+        
         return {"detail": "success"}
     except ValueError as ve:  # For data validation errors
         raise HTTPException(status_code=400, detail=str(ve))
