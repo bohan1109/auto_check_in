@@ -1,7 +1,7 @@
 from db import check_in_accounts as CheckInAccountDBModule
 from models import check_in_accounts as check_in_accounts_models
 from typing import Optional
-from crawlers.check_in_crawlers import CheckInCrawler
+from utils.check_in_crawlers import CheckInCrawler
 
 class CheckInAccountService:
     def __init__(self,check_in_accounts_db: Optional[CheckInAccountDBModule.CheckInAccountDB] = None) -> None:

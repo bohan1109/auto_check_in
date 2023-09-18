@@ -21,5 +21,4 @@ async def create_check_in_account(check_in_account: check_in_accounts_model.Chec
     except ValueError as ve:  # For data validation errors
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        return {"error": str(e)}
         raise HTTPException(detail="Server error",status_code=500)
