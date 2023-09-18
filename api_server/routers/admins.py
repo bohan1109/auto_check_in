@@ -1,8 +1,10 @@
 from fastapi import APIRouter
 from services import admins as AdminServiceModule
 from models import admins as admins_model
+from models import jwt as jwt_model
 from fastapi import HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
+from utils import jwt_utils as JWTUtilsModule
 router = APIRouter()
 
 
@@ -13,9 +15,8 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def get_current_admin(token: str = Depends(oauth2_scheme)) -> admins_model.TokenData:
     try:
-        admin_service = AdminServiceModule.AdminService()
-        payload = admin_service.decode_jwt_token(token)
-    except admins_model.JWTError:
+        payload = JWTUtilsModule.JWTUtils.decode_jwt_token(token)
+    except jwt_model.JWTError:
         raise HTTPException(
             status_code=401,
             detail="Could not validate credentials",

@@ -1,10 +1,8 @@
 from db import admins as AdminDBModule
 from models import admins as admin_models
 from typing import Optional
-from config import JWTConfig
 import bcrypt
-import jwt
-from datetime import datetime, timedelta
+
 
 
 class AdminService:
@@ -58,16 +56,4 @@ class AdminService:
         else:
             return False
         
-    def create_access_token(self,data: dict):
-        to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(days=JWTConfig.ACCESS_TOKEN_EXPIRE_MINUTES)
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(to_encode, JWTConfig.JWT_SECRET, algorithm=JWTConfig.ALGORITHM)
-        return encoded_jwt
-    
-    def decode_jwt_token(self, token: str) -> dict:
-        try:
-            payload = jwt.decode(token, JWTConfig.JWT_SECRET, algorithms=[JWTConfig.ALGORITHM])
-            return payload
-        except jwt.JWTError:
-            raise admin_models.JWTError("Could not validate credentials")
+
