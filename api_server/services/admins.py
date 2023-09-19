@@ -11,6 +11,10 @@ class AdminService:
             admins_db = AdminDBModule.AdminDB()
         self._admins_db = admins_db
 
+    async def fetch_admins(self):
+        result = await self._admins_db.read_admin()
+        return result
+
     async def fetch_admin(self, admin_id: str):
         result = await self._admins_db.read_admin_by_params("_id", admin_id)
         return result

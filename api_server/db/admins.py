@@ -39,6 +39,15 @@ class AdminDB:
         admin_data["_id"] = str(admin_data["_id"])
         return admin_data
 
+    async def read_admin(self):
+        collection = self.db.admins
+        admin_data = await collection.find().to_list(length=1000)
+        if not admin_data:
+            return None
+        for item in admin_data:
+            item["_id"] = str(item["_id"])
+        return admin_data
+
     async def create_admin(self, admin: AdminCreate):
         collection = self.db.admins
         admin_data = {
