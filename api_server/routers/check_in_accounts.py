@@ -32,3 +32,23 @@ async def create_check_in_account(
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(detail="Server error", status_code=500)
+    
+@router.get("/{check_in_account_id}")
+async def create_check_in_account(
+    check_in_account_id: str,
+    check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
+    current_admin: admins_model.TokenData = Depends(get_current_admin)    
+):
+    try:
+        check_in_account_data = await check_in_accounts_service.fetch_check_in_account(
+            check_in_account_id
+        )
+        if check_in_account_data is None:
+            raise HTTPException(status_code=404, detail="Data not found")
+        return check_in_account_data
+    except HTTPException as he:
+        raise he
+    except ValueError as ve:  # For data validation errors
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        raise HTTPException(detail="Server error", status_code=500)
