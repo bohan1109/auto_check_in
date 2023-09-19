@@ -39,10 +39,19 @@ class CheckInAccountDB:
 
         collection = self.db.check_in_accounts
 
-        admin_data = await collection.find_one(query)
+        check_in_account_data = await collection.find_one(query)
 
-        if admin_data is None:
+        if check_in_account_data is None:
             return None
 
-        admin_data["_id"] = str(admin_data["_id"])
-        return admin_data
+        check_in_account_data["_id"] = str(check_in_account_data["_id"])
+        return check_in_account_data
+    
+    async def read_check_in_accounts(self):
+        collection = self.db.check_in_accounts
+        check_in_account_data = await collection.find().to_list(length=1000)
+        if not check_in_account_data:
+            return None
+        for item in check_in_account_data:
+            item["_id"] = str(item["_id"])
+        return check_in_account_data

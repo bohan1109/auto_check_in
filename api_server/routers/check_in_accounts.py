@@ -52,3 +52,19 @@ async def create_check_in_account(
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(detail="Server error", status_code=500)
+    
+@router.get("/")
+async def read_admins(check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
+    current_admin: admins_model.TokenData = Depends(get_current_admin)):
+    try:
+        check_in_accounts_data =await check_in_accounts_service.fetch_check_in_accounts()
+        if check_in_accounts_data is None:
+            raise HTTPException(status_code=404, detail="Data not found")
+        return check_in_accounts_data
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        # 開法者模式使用
+        # return {"error": str(e)}
+        # 這裡捕獲了任何其他的異常
+        raise HTTPException(detail="Server error",status_code=500)

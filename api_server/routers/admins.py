@@ -36,7 +36,7 @@ async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminServi
         raise HTTPException(detail="Server error",status_code=500)
 
 @router.get("/")
-async def read_admin(admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
+async def read_admins(admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
         admin_data =await admins_service.fetch_admins()
         if admin_data is None:
