@@ -54,7 +54,7 @@ async def create_check_in_account(
         raise HTTPException(detail="Server error", status_code=500)
     
 @router.get("/")
-async def read_admins(check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
+async def read_check_in_accounts(check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
     current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
         check_in_accounts_data =await check_in_accounts_service.fetch_check_in_accounts()
@@ -68,3 +68,19 @@ async def read_admins(check_in_accounts_service: CheckInAccountServiceModule.Che
         # return {"error": str(e)}
         # 這裡捕獲了任何其他的異常
         raise HTTPException(detail="Server error",status_code=500)
+    
+@router.patch("/{check_in_account_id}")
+async def patch_check_in_account(
+    check_in_account_id: str,
+    check_in_account: check_in_accounts_model.CheckInAccountUpdate,
+    check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
+    current_admin: admins_model.TokenData = Depends(get_current_admin) 
+):
+    try:
+        await check_in_accounts_service.update_check_in_account(check_in_account_id,check_in_account)
+        return {"detail": "success"}
+    except ValueError as ve:  
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        print(e)
+        raise HTTPException(detail="Server error", status_code=500)

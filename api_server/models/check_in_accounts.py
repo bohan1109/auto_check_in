@@ -13,3 +13,9 @@ class CheckInAccountCreate(BaseModel):
             raise ValueError("Data can not be empty")
         return value
     
+
+class CheckInAccountUpdate(BaseModel):
+    check_in_account:Optional[str] = None
+    check_in_password: Optional[str] = None
+    login_success: Optional[bool] = None
+    check_in_username: Optional[str] = None

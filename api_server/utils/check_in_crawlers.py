@@ -65,14 +65,12 @@ class CheckInCrawler:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
             return False
         except NoSuchElementException:
-            print("Element not found!")
-            # 如果"msg"元素不存在，則可能是正常的登錄
-            pass
+            return True
+
         except Exception as e:
             print(f"Unexpected error: {e}")
             return False
-        finally:
-            # 確保在操作結束後關閉瀏覽器
-            self.driver.quit()
+            
     def close(self):
-        self.driver.close()
+        if self.driver.service.process:
+            self.driver.quit()

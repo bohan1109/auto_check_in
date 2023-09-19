@@ -55,3 +55,15 @@ class CheckInAccountDB:
         for item in check_in_account_data:
             item["_id"] = str(item["_id"])
         return check_in_account_data
+    
+    async def update_check_in_account(self, check_in_accounts_id: str, check_in_account_data: dict()):
+        collection = self.db.check_in_accounts
+
+        result = await collection.update_one(
+            {"_id": ObjectId(check_in_accounts_id)}, {"$set": check_in_account_data}
+        )
+
+        if result.modified_count > 0:
+            return check_in_account_data
+        else:
+            raise ValueError("Check in account could not be updated")
