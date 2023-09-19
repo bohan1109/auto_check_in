@@ -84,3 +84,18 @@ async def patch_check_in_account(
     except Exception as e:
         print(e)
         raise HTTPException(detail="Server error", status_code=500)
+
+@router.delete("/{check_in_account_id}")
+async def delete_check_in_account(
+    check_in_account_id: str,
+    check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
+    current_admin: admins_model.TokenData = Depends(get_current_admin) 
+):
+    try:
+        await check_in_accounts_service.delete_check_in_account(check_in_account_id)
+        return {"detail": "success"}
+    except ValueError as ve:  
+        raise HTTPException(status_code=400, detail=str(ve))
+    except Exception as e:
+        print(e)
+        raise HTTPException(detail="Server error", status_code=500)

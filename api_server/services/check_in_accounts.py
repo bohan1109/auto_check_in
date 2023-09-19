@@ -49,3 +49,7 @@ class CheckInAccountService:
         crawler_instance.close()
         result = await self._check_in_account_db.update_check_in_account(check_in_account_id,check_in_account.dict())
         return result
+    
+    async def delete_check_in_account(self,check_in_account_id:str):
+        result = await self._check_in_account_db.delete_check_in_account(check_in_account_id)
+        return result

@@ -1,3 +1,4 @@
+from gc import collect
 from bson import ObjectId
 import db.connect as db_module
 from bson.errors import InvalidId
@@ -65,5 +66,16 @@ class CheckInAccountDB:
 
         if result.modified_count > 0:
             return check_in_account_data
+        else:
+            raise ValueError("Check in account could not be updated")
+        
+    async def delete_check_in_account(self,check_in_account_id:str):
+        collection = self.db.check_in_accounts
+        result = await collection.delete_one(
+            {"_id": ObjectId(check_in_account_id)}
+        )
+
+        if result.deleted_count > 0:
+            return {"message": "Check in account successfully deleted."}
         else:
             raise ValueError("Check in account could not be updated")
