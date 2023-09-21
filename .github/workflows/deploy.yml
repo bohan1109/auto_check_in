@@ -19,15 +19,19 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           HOST: ${{ secrets.HOST }}
         run: |
-          echo "$SSH_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          echo "MY_SECRET_KEY=${{ secrets.MY_SECRET_KEY }}" > .env
-          echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" >> .env
-          echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
-          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "CRAWLER_WEBSITE=${{ secrets.CRAWLER_WEBSITE }}" >> .env
-          scp -o StrictHostKeyChecking=no -i private_key.pem .env $USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/
+          # Transfer .env file to the remote server
+          scp -o StrictHostKeyChecking=no -i "$SSH_KEY" .env "$USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/"
+
+          # Create .env file on the remote server (if it doesn't exist)
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "touch /home/ubuntu/auto_check_in/api_server/.env"
+
+          # Append environment variables to the .env file on the remote server
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "echo 'MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}' >> /home/ubuntu/auto_check_in/api_server/.env"
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "echo 'MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}' >> /home/ubuntu/auto_check_in/api_server/.env"
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "echo 'DATABASE_NAME=${{ secrets.DATABASE_NAME }}' >> /home/ubuntu/auto_check_in/api_server/.env"
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /home/ubuntu/auto_check_in/api_server/.env"
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "echo 'CRAWLER_WEBSITE=${{ secrets.CRAWLER_WEBSITE }}' >> /home/ubuntu/auto_check_in/api_server/.env"
+
 
       - name: Deploy to EC2
         env:
@@ -35,7 +39,5 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
         run: |
-          echo "$SSH_KEY" > private_key.pem
-          chmod 600 private_key.pem
-          scp -o StrictHostKeyChecking=no -i private_key.pem -r * $USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server
-          ssh -o StrictHostKeyChecking=no -i private_key.pem $USERNAME@$HOST "cd /home/ubuntu/auto_check_in/api_server && bash setup.sh"
+          ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$USERNAME@$HOST" "cd /home/ubuntu/auto_check_in/api_server && bash setup.sh"
+
