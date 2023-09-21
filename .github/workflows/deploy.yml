@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup .env file
+      - name: Setup .env file and private key
         env:
           SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
           USERNAME: ${{ secrets.USERNAME }}
@@ -21,13 +21,19 @@ jobs:
         run: |
           echo "$SSH_KEY" > private_key.pem
           chmod 600 private_key.pem
-          scp -o StrictHostKeyChecking=no -i private_key.pem .env "$USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/"
-          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "echo 'MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}' >> /home/ubuntu/auto_check_in/api_server/.env"
-          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "echo 'MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}' >> /home/ubuntu/auto_check_in/api_server/.env"
-          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "echo 'DATABASE_NAME=${{ secrets.DATABASE_NAME }}' >> /home/ubuntu/auto_check_in/api_server/.env"
-          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /home/ubuntu/auto_check_in/api_server/.env"
-          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "echo 'CRAWLER_WEBSITE=${{ secrets.CRAWLER_WEBSITE }}' >> /home/ubuntu/auto_check_in/api_server/.env"
+          
+          # 将 private_key.pem 传输到服务器
+          scp -o StrictHostKeyChecking=no -i private_key.pem private_key.pem "$USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/"
 
+          # 在本地创建 .env 文件，设置其中的内容
+          echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" > .env
+          echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "CRAWLER_WEBSITE=${{ secrets.CRAWLER_WEBSITE }}" >> .env
+          
+          # 将 .env 文件传输到服务器
+          scp -o StrictHostKeyChecking=no -i private_key.pem .env "$USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/"
 
       - name: Deploy to EC2
         env:
@@ -36,4 +42,3 @@ jobs:
           SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "cd /home/ubuntu/auto_check_in/api_server && bash setup.sh"
-
