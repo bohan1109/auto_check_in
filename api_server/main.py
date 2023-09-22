@@ -4,7 +4,8 @@ from routers import admins as admin_route
 from routers import check_in_accounts as check_in_account_route
 
 import logging
-app = FastAPI()
+
+app = FastAPI(root_path="/api")
 logging.basicConfig(level=logging.INFO)
 @app.get("/")
 def read_root():
