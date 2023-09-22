@@ -59,7 +59,8 @@ async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServ
     except ValueError as ve:  # For data validation errors
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        raise HTTPException(detail="Server error",status_code=500)
+        raise HTTPException(detail=str(e),status_code=500)
+        # raise HTTPException(detail="Server error",status_code=500)
         
 @router.patch("/{admin_id}")
 async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
