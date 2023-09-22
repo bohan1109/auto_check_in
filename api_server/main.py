@@ -5,14 +5,14 @@ from routers import check_in_accounts as check_in_account_route
 
 import logging
 
-app = FastAPI(root_path="/api")
+app = FastAPI()
 logging.basicConfig(level=logging.INFO)
-@app.get("/")
+@app.get("/api")
 def read_root():
     return {"Hello": "World"}
 
-app.include_router(admin_route.router, prefix="/admins", tags=["admins"])
-app.include_router(check_in_account_route.router, prefix="/check-in-accounts", tags=["check-in-accounts"])
+app.include_router(admin_route.router, prefix="/api/admins", tags=["admins"])
+app.include_router(check_in_account_route.router, prefix="/api/check-in-accounts", tags=["check-in-accounts"])
 
 @app.on_event("startup")
 async def startup_event():
