@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Pull latest code
+        run: |
+          git pull origin main
       - name: Setup .env file and private key
         env:
           SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
