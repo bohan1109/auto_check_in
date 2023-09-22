@@ -15,6 +15,7 @@ jobs:
 
       - name: Pull latest code
         run: |
+          git branch
           git pull origin main
       - name: Setup .env file and private key
         env:
