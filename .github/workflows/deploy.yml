@@ -13,11 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Pull latest code
-        run: |
-          git branch
-          git pull origin main:main
-
       - name: Setup .env file and private key
         env:
           SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
@@ -41,4 +36,5 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
         run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "cd /home/ubuntu/auto_check_in && git pull"
           ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "cd /home/ubuntu/auto_check_in/api_server && bash setup.sh"
