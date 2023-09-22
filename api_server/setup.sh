@@ -15,6 +15,7 @@ sudo usermod -aG docker ubuntu
 
 # 安裝Docker Compose
 sudo apt-get install -y docker-compose
+cd /home/ubuntu/auto_check_in/api_server
 
 sudo docker-compose up --build -d
 
