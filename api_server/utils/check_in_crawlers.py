@@ -11,12 +11,37 @@ import time
 class CheckInCrawler:
     def __init__(self) -> None:
         self.driver = webdriver.Chrome()
+    def check_in(self,check_in_account:dict):
+        try:
+            self.driver.get(CrawlerConfig.CRAWLER_WEBSITE)
+            account_text_input = self.driver.find_element(By.ID, 'id')
+            account_text_input.send_keys(check_in_account.check_in_account)
 
+            password_text_input = self.driver.find_element(By.ID, 'pw')
+            password_text_input.send_keys(check_in_account.check_in_password)
+
+            login_button = self.driver.find_element(By.ID, 'button')
+            login_button.click()
+            check_in_button=self.driver.find_element((By.CSS_SELECTOR, 'div[data-key="1"]'))
+            check_in_button.click()
+            success_element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
+            success_text = success_element.text
+            print(success_text)
+            if success_text == "success":
+                return True
+            else:
+                return False
+            # 若成功等待到元素，則回傳True
+        except TimeoutException:
+            # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
+            return False
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+            return False
 
     
     def login_result(self,check_in_account:CheckInAccountCreate):
         try:
-            print(check_in_account)
             self.driver.get(CrawlerConfig.CRAWLER_WEBSITE)
             account_text_input = self.driver.find_element(By.ID, 'id')
             account_text_input.send_keys(check_in_account.check_in_account)
