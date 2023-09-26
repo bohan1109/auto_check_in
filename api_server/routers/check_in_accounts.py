@@ -32,6 +32,7 @@ async def create_check_in_account(
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
         raise HTTPException(detail="Server error", status_code=500)
+        # raise HTTPException(detail=str(e), status_code=500)
     
 @router.get("/{check_in_account_id}")
 async def create_check_in_account(

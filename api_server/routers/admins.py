@@ -5,7 +5,7 @@ from models import jwt as jwt_model
 from fastapi import HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
 from utils.jwt_utils import get_current_admin
-
+from utils import jwt_utils as JWTUtilsModule
 router = APIRouter()
 
 
@@ -87,7 +87,7 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
     try:
         login_result = await admins_service.authenticate_admin(admin)
         if login_result:
-            access_token = admins_service.create_access_token(data={"sub": admin.account})
+            access_token =JWTUtilsModule.JWTUtils.create_access_token(data={"sub": admin.account})
             return {"access_token": access_token, "token_type": "bearer"}
         else:
             raise HTTPException(detail="Account or password error",status_code=401)
@@ -97,7 +97,7 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
         raise he
     except Exception as e:
         raise HTTPException(detail="Server error",status_code=500)
-        # raise HTTPException(detail="Server error",status_code=500)
+        # raise HTTPException(detail=str(e),status_code=500)
 
         
 
