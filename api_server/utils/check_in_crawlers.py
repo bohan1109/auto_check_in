@@ -6,23 +6,36 @@ from selenium.webdriver.support import expected_conditions as EC
 from config import CrawlerConfig
 from selenium.common.exceptions import TimeoutException
 from models.check_in_accounts import CheckInAccountCreate
+from webdriver_manager.chrome import ChromeDriverManager
 import time
 
 class CheckInCrawler:
     def __init__(self) -> None:
-        self.driver = webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+        options.add_argument('--headless')
+        options.add_argument('--no-sandbox')
+        options.add_argument('--disable-dev-shm-usage')
+        
+        # URL of the Selenium server from the docker-compose setup
+        selenium_url = "http://selenium:4444/wd/hub"
+        
+        self.driver = webdriver.Remote(
+            command_executor=selenium_url,
+            options=options
+            )
+
     def check_in(self,check_in_account:dict):
         try:
             self.driver.get(CrawlerConfig.CRAWLER_WEBSITE)
             account_text_input = self.driver.find_element(By.ID, 'id')
-            account_text_input.send_keys(check_in_account.check_in_account)
+            account_text_input.send_keys(check_in_account["check_in_account"])
 
             password_text_input = self.driver.find_element(By.ID, 'pw')
-            password_text_input.send_keys(check_in_account.check_in_password)
+            password_text_input.send_keys(check_in_account["check_in_password"])
 
             login_button = self.driver.find_element(By.ID, 'button')
             login_button.click()
-            check_in_button=self.driver.find_element((By.CSS_SELECTOR, 'div[data-key="1"]'))
+            check_in_button=self.driver.find_element(By.CSS_SELECTOR, 'div[data-key="1"]')
             check_in_button.click()
             success_element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
             success_text = success_element.text
@@ -43,6 +56,8 @@ class CheckInCrawler:
     def login_result(self,check_in_account:CheckInAccountCreate):
         try:
             self.driver.get(CrawlerConfig.CRAWLER_WEBSITE)
+            print(456)
+            print(check_in_account)
             account_text_input = self.driver.find_element(By.ID, 'id')
             account_text_input.send_keys(check_in_account.check_in_account)
 
@@ -74,5 +89,4 @@ class CheckInCrawler:
             return False
             
     def close(self):
-        if self.driver.service.process:
-            self.driver.quit()
+        self.driver.quit()

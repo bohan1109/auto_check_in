@@ -5,7 +5,7 @@ from models import jwt as jwt_model
 from models import admins as admins_model
 from fastapi import HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
-
+from utils import jwt_utils as JWTUtilsModule
 class JWTUtils:
     
     @staticmethod

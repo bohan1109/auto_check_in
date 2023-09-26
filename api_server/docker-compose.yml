@@ -14,6 +14,7 @@ services:
       - "8001:8000"
     depends_on:
       - mongodb
+      - selenium
 
   mongodb:
     image: mongo:latest
@@ -24,6 +25,11 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     volumes:
       - mongodb-data:/data/db
+
+  selenium:
+    image: "selenium/standalone-chrome:latest"
+    ports:
+      - "4444:4444"
 
 volumes:
   mongodb-data:
