@@ -1,22 +1,24 @@
 #!/bin/bash
+set -e
 
-# 更新系統
+echo "Updating system..."
 sudo apt-get update
 
-# 安裝Docker
+echo "Installing Docker..."
 sudo apt-get install -y docker.io
 
-# 啟動Docker服務並設置為開機啟動
+echo "Starting Docker service and setting it to start on boot..."
 sudo systemctl start docker
 sudo systemctl enable docker
 
-# 將ubuntu用戶添加到docker組
+echo "Adding ubuntu user to the docker group..."
 sudo usermod -aG docker ubuntu
 
-# 安裝Docker Compose
+echo "Installing Docker Compose..."
 sudo apt-get install -y docker-compose
-cd /home/ubuntu/auto_check_in/api_server
 
+echo "Changing directory and starting Docker Compose..."
+cd /home/ubuntu/auto_check_in/api_server
 sudo docker-compose up --build -d
 
 echo "Setup completed."
