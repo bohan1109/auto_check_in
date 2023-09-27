@@ -15,7 +15,7 @@ class CheckInCrawler:
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
-        
+        options.add_argument('--disable-gpu')
         # URL of the Selenium server from the docker-compose setup
         selenium_url = "http://selenium:4444/wd/hub"
         
@@ -39,7 +39,6 @@ class CheckInCrawler:
             check_in_button.click()
             success_element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
             success_text = success_element.text
-            print(success_text)
             if success_text == "success":
                 return True
             else:
@@ -47,17 +46,17 @@ class CheckInCrawler:
             # 若成功等待到元素，則回傳True
         except TimeoutException:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
+            self.close()
             return False
         except Exception as e:
             print(f"Unexpected error: {e}")
+            self.close()
             return False
 
     
     def login_result(self,check_in_account:CheckInAccountCreate):
         try:
             self.driver.get(CrawlerConfig.CRAWLER_WEBSITE)
-            print(456)
-            print(check_in_account)
             account_text_input = self.driver.find_element(By.ID, 'id')
             account_text_input.send_keys(check_in_account.check_in_account)
 
@@ -80,12 +79,14 @@ class CheckInCrawler:
             
         except TimeoutException:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
+            self.close()
             return False
         except NoSuchElementException:
             return True
 
         except Exception as e:
             print(f"Unexpected error: {e}")
+            self.close()
             return False
             
     def close(self):
