@@ -22,5 +22,7 @@ async def connect_to_mongo(app: FastAPI):
         await close_mongo_connection(app)
 
 async def close_mongo_connection(app: FastAPI):
+    global client
     client.close()
+    client = None
     logger.info("MongoDB connection closed.")
