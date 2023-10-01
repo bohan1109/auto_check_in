@@ -35,7 +35,7 @@ async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminServi
         # 這裡捕獲了任何其他的異常
         raise HTTPException(detail="Server error",status_code=500)
 
-@router.get("/")
+@router.get("")
 async def read_admins(admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
         admin_data =await admins_service.fetch_admins()
@@ -50,7 +50,7 @@ async def read_admins(admins_service: AdminServiceModule.AdminService = Depends(
         # 這裡捕獲了任何其他的異常
         raise HTTPException(detail="Server error",status_code=500)
 
-@router.post("/")
+@router.post("")
 async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
     try:
         await admins_service.create_admin(admin)

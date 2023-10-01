@@ -13,7 +13,7 @@ def get_check_in_account_service() -> CheckInAccountServiceModule.CheckInAccount
     return CheckInAccountServiceModule.CheckInAccountService()
 
 
-@router.post("/")
+@router.post("")
 async def create_check_in_account(
     check_in_account: check_in_accounts_model.CheckInAccountCreate,
     check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
@@ -54,7 +54,7 @@ async def create_check_in_account(
     except Exception as e:
         raise HTTPException(detail="Server error", status_code=500)
     
-@router.get("/")
+@router.get("")
 async def read_check_in_accounts(check_in_accounts_service: CheckInAccountServiceModule.CheckInAccountService = Depends(get_check_in_account_service),
     current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
