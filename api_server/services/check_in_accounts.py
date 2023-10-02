@@ -21,7 +21,6 @@ class CheckInAccountService:
         else:
             return False
         
-        crawler_instance.close()
         
         result = await self._check_in_account_db.create_check_in_account(check_in_account)
         return result
@@ -46,7 +45,6 @@ class CheckInAccountService:
             check_in_account.login_success=True
         else:
             return False
-        crawler_instance.close()
         result = await self._check_in_account_db.update_check_in_account(check_in_account_id,check_in_account.dict())
         return result
     

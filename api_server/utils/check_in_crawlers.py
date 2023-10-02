@@ -43,8 +43,10 @@ class CheckInCrawler:
             success_element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
             success_text = success_element.text
             if success_text == "success":
+                self.close()
                 return True
             else:
+                self.close()
                 return False
             # 若成功等待到元素，則回傳True
         except TimeoutException:
@@ -77,7 +79,7 @@ class CheckInCrawler:
 
             # 等待登入成功的指標元素出現
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-key="1"]')))
-            
+            self.close()
             # 若成功等待到元素，則回傳True
             return True
             
@@ -87,6 +89,7 @@ class CheckInCrawler:
             self.close()
             return False
         except NoSuchElementException:
+            self.close()
             return True
 
         except Exception as e:
