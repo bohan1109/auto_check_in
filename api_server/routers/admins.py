@@ -7,6 +7,8 @@ from fastapi.security import OAuth2PasswordBearer
 from utils.jwt_utils import get_current_admin
 from utils import jwt_utils as JWTUtilsModule
 router = APIRouter()
+import logging
+logger = logging.getLogger(__name__)
 
 
 def get_admins_service() -> AdminServiceModule.AdminService:
@@ -30,6 +32,7 @@ async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminServi
     except HTTPException as he:
         raise he
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         # 開法者模式使用
         # return {"error": str(e)}
         # 這裡捕獲了任何其他的異常
@@ -45,6 +48,7 @@ async def read_admins(admins_service: AdminServiceModule.AdminService = Depends(
     except HTTPException as he:
         raise he
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         # 開法者模式使用
         # return {"error": str(e)}
         # 這裡捕獲了任何其他的異常
@@ -57,8 +61,10 @@ async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServ
         
         return {"detail": "success"}
     except ValueError as ve:  # For data validation errors
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail=str(e),status_code=500)
         # raise HTTPException(detail="Server error",status_code=500)
         
@@ -68,8 +74,10 @@ async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_serv
         await admins_service.update_admin(admin_id,admin)
         return {"detail": "success"}
     except ValueError as ve:  
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
         
 @router.delete("/{admin_id}")
@@ -78,8 +86,10 @@ async def delete_admin(admin_id: str,admins_service: AdminServiceModule.AdminSer
         await admins_service.delete_admin(admin_id)
         return {"detail": "success"}
     except ValueError as ve:  
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error",status_code=500)
     
 @router.post("/login")
@@ -92,10 +102,12 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
         else:
             raise HTTPException(detail="Account or password error",status_code=401)
     except ValueError as ve:  
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except HTTPException as he:
         raise he
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error",status_code=500)
         # raise HTTPException(detail=str(e),status_code=500)
 
