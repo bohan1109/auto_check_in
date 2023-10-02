@@ -5,7 +5,8 @@ from models import check_in_accounts as check_in_accounts_model
 from fastapi.security import OAuth2PasswordBearer
 from utils.jwt_utils import get_current_admin
 from models import admins as admins_model
-
+import logging
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
@@ -29,8 +30,10 @@ async def create_check_in_account(
         else:
             raise HTTPException(status_code=400, detail="Login fail")
     except ValueError as ve:  # For data validation errors
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
         # raise HTTPException(detail=str(e), status_code=500)
     
@@ -50,8 +53,10 @@ async def create_check_in_account(
     except HTTPException as he:
         raise he
     except ValueError as ve:  # For data validation errors
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
     
 @router.get("")
@@ -65,6 +70,7 @@ async def read_check_in_accounts(check_in_accounts_service: CheckInAccountServic
     except HTTPException as he:
         raise he
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         # 開法者模式使用
         # return {"error": str(e)}
         # 這裡捕獲了任何其他的異常
@@ -81,9 +87,10 @@ async def patch_check_in_account(
         await check_in_accounts_service.update_check_in_account(check_in_account_id,check_in_account)
         return {"detail": "success"}
     except ValueError as ve:  
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        print(e)
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
 
 @router.delete("/{check_in_account_id}")
@@ -96,7 +103,8 @@ async def delete_check_in_account(
         await check_in_accounts_service.delete_check_in_account(check_in_account_id)
         return {"detail": "success"}
     except ValueError as ve:  
+        logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
-        print(e)
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
