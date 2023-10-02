@@ -8,7 +8,10 @@ from selenium.common.exceptions import TimeoutException
 from models.check_in_accounts import CheckInAccountCreate
 from webdriver_manager.chrome import ChromeDriverManager
 import time
+import logging
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 class CheckInCrawler:
     def __init__(self) -> None:
         options = webdriver.ChromeOptions()
@@ -45,11 +48,12 @@ class CheckInCrawler:
                 return False
             # 若成功等待到元素，則回傳True
         except TimeoutException:
+            logger.error("TimeoutException encountered while checking in.")
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
             self.close()
             return False
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            logger.error(f"Unexpected error: {e}")
             self.close()
             return False
 
@@ -67,7 +71,7 @@ class CheckInCrawler:
             login_button.click()
             time.sleep(1)
             error_message = self.driver.find_element(By.ID, 'msg').text
-            print(f"error_message: {error_message}")
+            logger.info(f"Error message: {error_message}")
             if "帳號密碼錯誤" in error_message:
                 return False
 
@@ -79,13 +83,14 @@ class CheckInCrawler:
             
         except TimeoutException:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
+            logger.error("TimeoutException encountered while checking login result.")
             self.close()
             return False
         except NoSuchElementException:
             return True
 
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            logger.error(f"Unexpected error: {e}")
             self.close()
             return False
             
