@@ -41,7 +41,6 @@ async def main():
     for idx, check_in_account in enumerate(check_in_accounts):
         logger.info(f"Processing account {idx+1}...")
         check_in_crawler.check_in(check_in_account)
-        check_in_crawler.close()
     
     await close_mongo_connection()
     logger.info("Script finished successfully!")
