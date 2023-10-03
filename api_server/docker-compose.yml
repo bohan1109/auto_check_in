@@ -30,6 +30,8 @@ services:
     image: "selenium/standalone-chrome:latest"
     ports:
       - "4444:4444"
+    privileged: true
+    shm_size: 2g
 
 volumes:
   mongodb-data:
