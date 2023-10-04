@@ -43,21 +43,19 @@ class CheckInCrawler:
             success_element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
             success_text = success_element.text
             if success_text == "success":
-                self.close()
                 return True
             else:
-                self.close()
                 return False
             # 若成功等待到元素，則回傳True
         except TimeoutException:
             logger.error("TimeoutException encountered while checking in.")
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
-            self.close()
             return False
         except Exception as e:
             logger.error(f"Unexpected error: {e}")
-            self.close()
             return False
+        finally:
+            self.close()
 
     
     def login_result(self,check_in_account:CheckInAccountCreate):
@@ -79,23 +77,21 @@ class CheckInCrawler:
 
             # 等待登入成功的指標元素出現
             WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-key="1"]')))
-            self.close()
             # 若成功等待到元素，則回傳True
             return True
             
         except TimeoutException:
             # 若發生TimeoutException異常，表示指定元素未在預期時間內出現，則回傳False
             logger.error("TimeoutException encountered while checking login result.")
-            self.close()
             return False
         except NoSuchElementException:
-            self.close()
             return True
 
         except Exception as e:
             logger.error(f"Unexpected error: {e}")
-            self.close()
             return False
+        finally:
+            self.close()
             
     def close(self):
         self.driver.quit()
