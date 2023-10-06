@@ -27,7 +27,7 @@ services:
       - mongodb-data:/data/db
 
   selenium:
-    image: "seleniarm/standalone-chromium:latest"
+    image: "selenium/standalone-chrome:latest"
     ports:
       - "4444:4444"
     privileged: true
