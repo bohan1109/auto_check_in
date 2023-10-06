@@ -32,6 +32,7 @@ services:
       - "4444:4444"
     privileged: true
     shm_size: 2g
+    mem_limit: 4g
 
 volumes:
   mongodb-data:
