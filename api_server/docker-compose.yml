@@ -33,6 +33,7 @@ services:
     privileged: true
     shm_size: 2g
     mem_limit: 4g
+    stop_grace_period: 2m
 
 volumes:
   mongodb-data:
