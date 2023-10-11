@@ -14,7 +14,7 @@ services:
       - "8001:8000"
     depends_on:
       - mongodb
-      - selenium
+      # - selenium
 
   mongodb:
     image: mongo:6.0
@@ -26,13 +26,14 @@ services:
     volumes:
       - mongodb-data:/data/db
 
-  selenium:
-    image: "selenium/standalone-chrome:latest"
-    ports:
-      - "4444:4444"
-    privileged: true
-    shm_size: 2g
-    mem_limit: 4g
+  # selenium:
+  #   image: "selenium/standalone-chrome:latest"
+  #   ports:
+  #     - "4444:4444"
+  #   privileged: true
+  #   shm_size: 2g
+  #   mem_limit: 4g
+  #   stop_grace_period: 2m
 
 volumes:
   mongodb-data:

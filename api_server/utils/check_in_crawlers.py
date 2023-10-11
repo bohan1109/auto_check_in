@@ -9,23 +9,33 @@ from models.check_in_accounts import CheckInAccountCreate
 from webdriver_manager.chrome import ChromeDriverManager
 import time
 import logging
-
+import chromedriver_autoinstaller
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 class CheckInCrawler:
     def __init__(self) -> None:
+        chromedriver_autoinstaller.install()  # 自动安装Chromedriver
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
-        # URL of the Selenium server from the docker-compose setup
-        selenium_url = "http://selenium:4444/wd/hub"
+        options.binary_location = '/usr/bin/chromium'  # 设置Chromium可执行文件路径
+
+        self.driver = webdriver.Chrome(options=options)
+        #使用selenium容器使用
+        # options = webdriver.ChromeOptions()
+        # options.add_argument('--headless')
+        # options.add_argument('--no-sandbox')
+        # options.add_argument('--disable-dev-shm-usage')
+        # options.add_argument('--disable-gpu')
+        # # URL of the Selenium server from the docker-compose setup
+        # selenium_url = "http://selenium:4444/wd/hub"
         
-        self.driver = webdriver.Remote(
-            command_executor=selenium_url,
-            options=options
-            )
+        # self.driver = webdriver.Remote(
+        #     command_executor=selenium_url,
+        #     options=options
+        #     )
 
     def check_in(self,check_in_account:dict):
         try:
