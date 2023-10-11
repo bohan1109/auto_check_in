@@ -1,9 +1,14 @@
-FROM python:3.9-slim
+# FROM python:3.9-slim
+FROM python:3.11.6-alpine3.18
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-
+#apk指令為alpine容器專用
+RUN apk update && apk upgrade && \
+    apk add -u gcc musl-dev && \
+    apk add -u libexif udev chromium chromium-chromedriver xvfb && \
+    apk add --no-cache tzdata
 # Set work directory
 WORKDIR /usr/src/backend
 
