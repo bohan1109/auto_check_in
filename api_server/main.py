@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from db.connect import connect_to_mongo, close_mongo_connection
 from routers import admins as admin_route
 from routers import check_in_accounts as check_in_account_route
-
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
@@ -21,6 +21,14 @@ class ProcessTimeMiddleware(BaseHTTPMiddleware):
         logger.info(f"Processed request in {process_time:.4f} seconds")
         return response
 app = FastAPI()
+# Add CORS middleware to your FastAPI application
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # List of allowed origins, e.g., ["http://localhost:3000"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 logging.basicConfig(level=logging.INFO)
 @app.get("/api")
 def read_root():
