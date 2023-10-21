@@ -17,7 +17,9 @@ const LoginPage: React.FC = () => {
             password: password
         })
             .then((response) => {
-                console.log(response)
+                const jwtToken = response.data.access_token
+                localStorage.setItem('jwtTokenType', 'Bearer'); 
+                localStorage.setItem('jwtToken', jwtToken);     
             }).catch((error) => {
                 console.log(error)
             })
