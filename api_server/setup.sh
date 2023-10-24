@@ -21,4 +21,7 @@ echo "Changing directory and starting Docker Compose..."
 cd /home/ubuntu/auto_check_in/api_server
 sudo docker-compose up --build -d
 
+sudo timedatectl set-timezone Asia/Taipei
+echo "set-timezone Asia/Taipei"
+
 echo "Setup completed."
