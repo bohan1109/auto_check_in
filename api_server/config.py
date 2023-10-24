@@ -15,3 +15,5 @@ class JWTConfig:
     
 class CrawlerConfig:
     CRAWLER_WEBSITE = config("CRAWLER_WEBSITE")
+    
+

@@ -2,7 +2,7 @@ from db import check_in_accounts as CheckInAccountDBModule
 from models import check_in_accounts as check_in_accounts_models
 from typing import Optional
 from utils.check_in_crawlers import CheckInCrawler
-
+from utils.encryption import Encryption
 class CheckInAccountService:
     def __init__(self,check_in_accounts_db: Optional[CheckInAccountDBModule.CheckInAccountDB] = None) -> None:
         if check_in_accounts_db is None:
@@ -20,7 +20,10 @@ class CheckInAccountService:
             check_in_account.login_success=True
         else:
             return False
-        
+        print(f"Password to be encrypted: {check_in_account.check_in_password}, Type: {type(check_in_account.check_in_password)}")
+        encryption = Encryption()
+        encrypted_check_in_password = encryption.encrypt(check_in_account.check_in_password)
+        check_in_account.check_in_password = encrypted_check_in_password
         
         result = await self._check_in_account_db.create_check_in_account(check_in_account)
         return result

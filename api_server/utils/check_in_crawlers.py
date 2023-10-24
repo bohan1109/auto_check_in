@@ -7,19 +7,21 @@ from config import CrawlerConfig
 from selenium.common.exceptions import TimeoutException
 from models.check_in_accounts import CheckInAccountCreate
 from webdriver_manager.chrome import ChromeDriverManager
+from utils.encryption import Encryption
 import time
 import logging
-import chromedriver_autoinstaller
+# import chromedriver_autoinstaller
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 class CheckInCrawler:
     def __init__(self) -> None:
-        chromedriver_autoinstaller.install()  # 自动安装Chromedriver
+
         options = webdriver.ChromeOptions()
         options.add_argument('--headless')
         options.add_argument('--no-sandbox')
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument('--disable-gpu')
+        options.add_argument("--disable-application-cache")
         options.binary_location = '/usr/bin/chromium'  # 设置Chromium可执行文件路径
 
         self.driver = webdriver.Chrome(options=options)
@@ -40,6 +42,8 @@ class CheckInCrawler:
     def check_in(self,check_in_account:dict):
         try:
             self.driver.get(CrawlerConfig.CRAWLER_WEBSITE)
+            encryption = Encryption()
+            check_in_account["check_in_password"] = encryption.decrypt(check_in_account["check_in_password"])
             account_text_input = self.driver.find_element(By.ID, 'id')
             account_text_input.send_keys(check_in_account["check_in_account"])
 
@@ -50,12 +54,8 @@ class CheckInCrawler:
             login_button.click()
             check_in_button=self.driver.find_element(By.CSS_SELECTOR, 'div[data-key="1"]')
             check_in_button.click()
-            success_element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
-            success_text = success_element.text
-            if success_text == "success":
-                return True
-            else:
-                return False
+            WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID,"success")))
+            return True
             # 若成功等待到元素，則回傳True
         except TimeoutException:
             logger.error("TimeoutException encountered while checking in.")
