@@ -27,6 +27,8 @@ jobs:
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "CRAWLER_WEBSITE=${{ secrets.CRAWLER_WEBSITE }}" >> .env
+          echo "AES_KEY=${{ secrets.AES_KEY }}" >> AES_config.py
+          scp -o StrictHostKeyChecking=no -i private_key.pem AES_config.py "$USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/"
           scp -o StrictHostKeyChecking=no -i private_key.pem .env "$USERNAME@$HOST:/home/ubuntu/auto_check_in/api_server/"
           ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "rm /home/ubuntu/auto_check_in/api_server/private_key.pem"
 

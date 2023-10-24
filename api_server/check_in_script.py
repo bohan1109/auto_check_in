@@ -14,7 +14,6 @@ logger = logging.getLogger()
 # 创建 MongoDB 客户端
 client = AsyncIOMotorClient(DatabaseConfig.MONGODB_URL)
 db = client[DatabaseConfig.DATABASE_NAME]
-
 async def connect_to_mongo():
     logger.info("Attempting to connect to MongoDB...")
     try:
