@@ -1,3 +1,4 @@
+from math import dist
 import models
 from services.check_in_accounts import CheckInAccountService
 from utils.check_in_crawlers import CheckInCrawler
@@ -6,6 +7,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from config import DatabaseConfig
 import asyncio
 import logging
+from datetime import datetime
 
 # 设置日志
 logging.basicConfig(level=logging.INFO)
@@ -30,19 +32,49 @@ async def close_mongo_connection():
 async def main():
     logger.info("Script started!")
     await connect_to_mongo()
-
-    check_in_crawler = CheckInCrawler()
     collection = db.check_in_accounts
     logger.info("Fetching check-in accounts...")
     check_in_accounts = await collection.find().to_list(length=1000)
     logger.info(f"Found {len(check_in_accounts)} check-in accounts.")
+    holiday_list = [
+        datetime(2024, 1, 1).date(),
+        datetime(2024, 2, 8).date(),
+        datetime(2024, 2, 9).date(),
+        datetime(2024, 2, 12).date(),
+        datetime(2024, 2, 13).date(),
+        datetime(2024, 2, 14).date(),
+        datetime(2024, 2, 28).date(),
+        datetime(2024, 4, 4).date(),
+        datetime(2024, 4, 5).date(),
+        datetime(2024, 6, 10).date(),
+        datetime(2024, 9, 17).date(),
+        datetime(2024, 10, 10).date(),
+    ]
+    workday_list=[
+        datetime(2024, 2, 17).date(),
+        
+    ]
+    current_date = datetime.now().date()
+    if current_date.weekday() <= 4 or current_date in workday_list:
+        check_in(check_in_accounts)
+    elif current_date in holiday_list:
+        check_in(check_in_accounts)
+
+    # check_in_crawler = CheckInCrawler()
     
-    for idx, check_in_account in enumerate(check_in_accounts):
-        logger.info(f"Processing account {idx+1}...")
-        check_in_crawler.check_in(check_in_account)
+    
+    # for idx, check_in_account in enumerate(check_in_accounts):
+    #     logger.info(f"Processing account {idx+1}...")
+    #     check_in_crawler.check_in(check_in_account)
     
     await close_mongo_connection()
     logger.info("Script finished successfully!")
+
+def check_in(check_in_accounts:dist):
+    check_in_crawler = CheckInCrawler()
+    for idx, check_in_account in enumerate(check_in_accounts):
+        logger.info(f"Processing account {idx+1}...")
+        check_in_crawler.check_in(check_in_account)
 
 if __name__ == "__main__":
     asyncio.run(main())
