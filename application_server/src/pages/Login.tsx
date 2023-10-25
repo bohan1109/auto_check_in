@@ -1,10 +1,11 @@
 import * as React from 'react';
 import api from '../Axios.config'
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 const LoginPage: React.FC = () => {
     const [account, setAccount] = React.useState('');
     const [password, setPassword] = React.useState('');
-
+    const navigate = useNavigate();
     const handleAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAccount(e.target.value);
     };
@@ -19,7 +20,8 @@ const LoginPage: React.FC = () => {
             .then((response) => {
                 const jwtToken = response.data.access_token
                 localStorage.setItem('jwtTokenType', 'Bearer'); 
-                localStorage.setItem('jwtToken', jwtToken);     
+                localStorage.setItem('jwtToken', jwtToken);    
+                navigate('/home'); 
             }).catch((error) => {
                 console.log(error)
             })
@@ -27,7 +29,7 @@ const LoginPage: React.FC = () => {
     return (
         <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
             <Grid item xs={12} sm={6} md={4}>
-                <Paper elevation={3} style={{ padding: '20px' }}>
+                <Paper elevation={2} style={{ padding: '20px' }}>
                     <Typography variant="h4" gutterBottom align="center">
                         零次方自動打卡系統
                     </Typography>
