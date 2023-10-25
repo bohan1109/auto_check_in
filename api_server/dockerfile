@@ -4,6 +4,7 @@ FROM python:3.11.6-alpine3.18
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
+ENV TZ=Asia/Taipei
 #apk指令為alpine容器專用
 RUN apk update && apk upgrade && \
     apk add -u gcc musl-dev && \
