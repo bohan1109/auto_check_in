@@ -27,8 +27,8 @@ echo "set-timezone Asia/Taipei"
 sudo docker image prune -a -f
 echo "remove idle images"
 
-(crontab -l | grep -q "35 8 \* \* \* docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") || (crontab -l; echo "35 8 * * * docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") | crontab -
-(crontab -l | grep -q "5 18 \* \* \* docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") || (crontab -l; echo "5 18 * * * docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") | crontab -
+(crontab -l 2>/dev/null | grep -q "35 8 \* \* \* docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") || (crontab -l 2>/dev/null; echo "35 8 * * * docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") | crontab -
+(crontab -l 2>/dev/null | grep -q "5 18 \* \* \* docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") || (crontab -l 2>/dev/null; echo "5 18 * * * docker exec api_server_web_1 python /usr/src/backend/check_in_script.py") | crontab -
 echo "set crontap"
 
 echo "Setup completed."
