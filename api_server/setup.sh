@@ -24,4 +24,7 @@ sudo docker-compose up --build -d
 sudo timedatectl set-timezone Asia/Taipei
 echo "set-timezone Asia/Taipei"
 
+sudo docker image prune -a -f
+echo "remove idle images"
+
 echo "Setup completed."
