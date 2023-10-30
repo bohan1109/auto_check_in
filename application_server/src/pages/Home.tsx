@@ -80,7 +80,7 @@ const HomePage: React.FC = () => {
 
     return (
         <>
-            <Box mt={20} mx={4}>  {/* mt表示上邊距，mx表示左右邊距 */}
+            <Box mt={20} mx={4}>
                 <DataTable rows={checkInAccountData}
                     columns={columns}
                     paginationModel={{ page: 0, pageSize: 5 }}

@@ -1,6 +1,7 @@
 import React from 'react';
 import LoginPage from './pages/Login'
 import Home from './pages/Home';
+import CheckInAccountFormPage from './pages/CheckInAccountForm';
 import {
   BrowserRouter as Router,
   Routes,
@@ -13,6 +14,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/home" element={<Home />} />
+          <Route path="/check-in-account" element={<CheckInAccountFormPage />} />
         </Routes>
       </Router>
   );
