@@ -47,7 +47,6 @@ const LoginPage: React.FC = () => {
                         margin="normal"
                         type="password"
                         onChange={handlePassword}
-                        onClick={handelLoginButton}
                     />
                     <Button variant="contained" color="primary" fullWidth onClick={handelLoginButton}>
                         登入
