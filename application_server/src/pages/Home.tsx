@@ -1,9 +1,9 @@
 import * as React from 'react';
 import api from '../Axios.config'
 import DataTable from '../components/Table'
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import { GridColDef, GridRowId } from '@mui/x-data-grid';
-
+import { useNavigate } from 'react-router-dom';
 const HomePage: React.FC = () => {
     interface CheckInAccount {
         _id: string;
@@ -12,6 +12,7 @@ const HomePage: React.FC = () => {
         check_in_password: string;
         check_in_username: string;
     }
+    const navigate = useNavigate();
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
     const [boolean, setBoolean] = React.useState(true)
     const jwtToken = localStorage.getItem("jwtToken")
@@ -61,6 +62,9 @@ const HomePage: React.FC = () => {
 
     ];
 
+    const handelLoginButton = () => {
+        navigate('/check-in-account');
+    }
 
 
     React.useEffect(() => {
@@ -80,7 +84,12 @@ const HomePage: React.FC = () => {
 
     return (
         <>
-            <Box mt={20} mx={4}>
+            <Box m={2} mx={4}> {/* m = margin */}
+                <Button variant="contained" color="primary" onClick={handelLoginButton}>
+                    新增打卡帳號
+                </Button>
+            </Box>
+            <Box mt={4} mx={4}>
                 <DataTable rows={checkInAccountData}
                     columns={columns}
                     paginationModel={{ page: 0, pageSize: 5 }}
