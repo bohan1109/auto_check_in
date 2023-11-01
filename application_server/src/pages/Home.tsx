@@ -4,6 +4,7 @@ import DataTable from '../components/Table'
 import { Box, Button } from '@mui/material';
 import { GridColDef, GridRowId } from '@mui/x-data-grid';
 import { useNavigate } from 'react-router-dom';
+import EditIcon from '@mui/icons-material/Edit';
 const HomePage: React.FC = () => {
     interface CheckInAccount {
         _id: string;
@@ -53,9 +54,10 @@ const HomePage: React.FC = () => {
             renderCell: (params) => {
                 const id = params.id;  // 這裡獲取到該行的id
                 return (
-                    <button onClick={() => handleButtonClick(id)}>
-                        按鈕
-                    </button>
+                    <EditIcon
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleButtonClick(id)}
+                    />
                 );
             },
         },
