@@ -21,6 +21,7 @@ const DataTable: React.FC<DataTableProps> = ({ rows, columns, paginationModel, p
                 }}
                 pageSizeOptions={pageSizeOptions}
                 checkboxSelection
+                disableRowSelectionOnClick
             />
         </div>
     );
