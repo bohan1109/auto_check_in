@@ -1,7 +1,6 @@
 import React from 'react';
 import LoginPage from './pages/Login'
 import Home from './pages/Home';
-import CheckInAccountFormPage from './pages/CheckInAccountForm';
 import {
   BrowserRouter as Router,
   Routes,
@@ -26,7 +25,6 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/home" element={!tokenContext?<Home />:<Navigate to="/" replace />} />
-          <Route path="/check-in-account" element={!tokenContext?<CheckInAccountFormPage />:<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </TokenContext.Provider>
