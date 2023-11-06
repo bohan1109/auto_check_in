@@ -2,19 +2,21 @@ import * as React from 'react';
 import api from '../Axios.config'
 import DataTable from '../components/Table'
 import { Box, Button } from '@mui/material';
-import { GridColDef, GridRowId } from '@mui/x-data-grid';
-import { useNavigate } from 'react-router-dom';
+import { GridColDef } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
+import FormDialog from "../components/FormDialog";
+import _ from 'lodash';
 const HomePage: React.FC = () => {
     interface CheckInAccount {
-        _id: string;
-        login_success: boolean;
-        check_in_account: string;
-        check_in_password: string;
-        check_in_username: string;
+        id: string; 
+        loginSuccess: boolean; 
+        checkInAccount: string; 
+        checkInPassword: string; 
+        checkInUsername: string; 
     }
-    const navigate = useNavigate();
+
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
+    const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
     const [boolean, setBoolean] = React.useState(true)
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
@@ -23,18 +25,15 @@ const HomePage: React.FC = () => {
             Authorization: `${jwtTokenType} ${jwtToken}`
         },
     }
-    const handleButtonClick = (id: GridRowId) => {
-        // 這裡你可以使用該id做任何操作
-        console.log(id);
-    };
+
     const columns: GridColDef[] = [
         {
-            field: 'check_in_account',
+            field: 'checkInAccount',
             headerName: '打卡帳號',
             width: 150,
         },
         {
-            field: 'check_in_password',
+            field: 'checkInPassword',
             headerName: '密碼',
             width: 150,
             renderCell: () => {
@@ -43,7 +42,7 @@ const HomePage: React.FC = () => {
             }
         },
         {
-            field: 'check_in_username',
+            field: 'checkInUsername',
             headerName: '使用者',
             width: 110,
         }, {
@@ -52,11 +51,11 @@ const HomePage: React.FC = () => {
             sortable: false,
             width: 150,
             renderCell: (params) => {
-                const id = params.id;  // 這裡獲取到該行的id
+                const rowData = checkInAccountData.find(item => item.id === params.id);
                 return (
                     <EditIcon
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleButtonClick(id)}
+                        onClick={() => handleOpen(rowData)}
                     />
                 );
             },
@@ -64,19 +63,35 @@ const HomePage: React.FC = () => {
 
     ];
 
-    const handelLoginButton = () => {
-        navigate('/check-in-account');
-    }
+    const [dialogOpen, setDialogOpen] = React.useState(false);
+
+    const handleOpen = (data?: CheckInAccount) => {
+        if (data) {
+            setDataToPass(data);
+            setDialogOpen(true);
+        } else {
+            setDataToPass(undefined);
+        }
+        setDialogOpen(true);
+    };
+    const handleClose = () => setDialogOpen(false);
+
+    const handleAddNew = () => {
+        setDataToPass(undefined);
+        setDialogOpen(true);
+    };
+    
 
 
     React.useEffect(() => {
         api.get("/check-in-accounts", config)
             .then((response) => {
                 const formattedData = response.data.map((item: CheckInAccount) => {
-                    return { ...item, id: item._id };
+                    const camelCaseItem = _.mapKeys(item, (value, key) => _.camelCase(key));
+                    return { ...camelCaseItem, id: camelCaseItem.id }; 
                 });
-
-                setCheckInAccountData(formattedData)
+    
+                setCheckInAccountData(formattedData);
             }).catch(error => {
                 console.log(error)
             })
@@ -86,8 +101,16 @@ const HomePage: React.FC = () => {
 
     return (
         <>
+        <FormDialog
+                title="填寫資料"
+                open={dialogOpen}
+                handleClose={handleClose}
+                data={dataToPass}
+                boolean={boolean}
+                setBoolean={setBoolean}
+            />
             <Box m={2} mx={4}> {/* m = margin */}
-                <Button variant="contained" color="primary" onClick={handelLoginButton}>
+            <Button variant="contained" color="primary" onClick={handleAddNew}>
                     新增打卡帳號
                 </Button>
             </Box>

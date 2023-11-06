@@ -1,56 +1,137 @@
 import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
-
+import api from '../Axios.config'
+import _ from 'lodash';
 interface FormDialogProps {
-    id?: string
     title: string;
-    onConfirm: (data: { account: string; password: string; checkInAccountUser: string }) => void;
-    onCancel: () => void;
+    data?: {
+        id:string;
+        checkInAccount: string;
+        checkInPassword: string;
+        checkInUsername: string;
+    };
     open: boolean;
     handleClose: () => void;
+    boolean:boolean;
+    setBoolean: (value: boolean) => void;
 }
 
-const FormDialog: React.FC<FormDialogProps> = ({ id, title, onConfirm, onCancel, open, handleClose }) => {
-    const [account, setAccount] = useState('');
-    const [password, setPassword] = useState('');
-    const [checkInAccountUser, setCheckInAccountUser] = useState('');
+const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,boolean,setBoolean }) => {
+    const [checkInAccount, setCheckInAccount] = useState(data?.checkInAccount || '');
+    const [checkInPassword, setCheckInPassword] = useState('');
+    const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
+    const jwtToken = localStorage.getItem("jwtToken")
+    const jwtTokenType = localStorage.getItem("jwtTokenType")
+    React.useEffect(() => {
+        if (data?.id) {
+            setCheckInAccount(data.checkInAccount);
+            setCheckInUsername(data.checkInUsername);
+        } else {
+            // 重置表单字段状态
+            setCheckInAccount('');
+            setCheckInPassword('');
+            setCheckInUsername('');
+        }
+    }, [data]);
+    const config = {
+        headers: {
+            Authorization: `${jwtTokenType} ${jwtToken}`
+        },
+    }
+    
+    const editData = ()=>{
+        const updateData = {
+            checkInAccount:checkInAccount,
+            checkInPassword:checkInPassword,
+            checkInUsername:checkInUsername,
+        }
+        const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
+        console.log(`/check-in-accounts/${data?.id}`)
+        console.log(formattedData)
+        api.patch(`/check-in-accounts/${data?.id}`,formattedData,config)
+        .then((response)=>{
+            console.log("修改成功",response.data)
+            setBoolean(!boolean)
+            handleClose()
+        }).catch((error) => {
+            if (error.response) {
+                console.log('Error', error.response.status);
+                console.log('Error data', error.response.data);
+            } else if (error.request) {
+                console.log('Error with request', error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        })
+    }
 
-    const handleConfirmClick = () => {
-        onConfirm({ account, password, checkInAccountUser });
-        handleClose();
+    const createData = ()=>{
+        const createData = {
+            checkInAccount:checkInAccount,
+            checkInPassword:checkInPassword,
+            checkInUsername:checkInUsername,
+        }
+        const formattedData = _.mapKeys(createData, (value, key) => _.snakeCase(key));
+        api.post(`/check-in-accounts`,formattedData,config)
+        .then((response)=>{
+            console.log("新增成功",response.data)
+            setBoolean(!boolean)
+            handleClose()
+        }).catch((error) => {
+            if (error.response) {
+                console.log('Error', error.response.status);
+                console.log('Error data', error.response.data);
+            } else if (error.request) {
+                console.log('Error with request', error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        })
+    }
+
+    const handleSave = () => {
+        if (data) {
+            editData();
+            console.log("update")
+        } else {
+            console.log("create")
+            createData();
+        }
     };
 
     return (
         <Dialog open={open} onClose={handleClose}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
-            <TextField
+                <TextField
                     margin="normal"
                     fullWidth
                     label="使用者"
-                    value={checkInAccountUser}
-                    onChange={(e) => setCheckInAccountUser(e.target.value)}
+                    value={checkInUsername}
+                    onChange={(e) => setCheckInUsername(e.target.value)}
                 />
                 <TextField
                     margin="normal"
                     fullWidth
                     label="帳號"
-                    value={account}
-                    onChange={(e) => setAccount(e.target.value)}
+                    value={checkInAccount}
+                    onChange={(e) => setCheckInAccount(e.target.value)}
                 />
                 <TextField
                     margin="normal"
                     fullWidth
                     type="password"
                     label="密碼"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={checkInPassword}
+                    onChange={(e) => setCheckInPassword(e.target.value)}
                 />
 
             </DialogContent>
             <DialogActions>
                 <Button onClick={handleClose}>取消</Button>
-                <Button onClick={handleConfirmClick}>確認</Button>
+                <Button onClick={handleSave}>確認</Button>
             </DialogActions>
         </Dialog>
     );
