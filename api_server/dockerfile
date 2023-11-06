@@ -6,10 +6,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 ENV TZ=Asia/Taipei
 #apk指令為alpine容器專用
-RUN apk update && apk upgrade && \
-    apk add -u gcc musl-dev && \
-    apk add -u libexif udev chromium chromium-chromedriver xvfb && \
-    apk add --no-cache tzdata
+RUN apk update && apk add --no-cache gcc musl-dev libexif udev chromium chromium-chromedriver xvfb tzdata
+
 # Set work directory
 WORKDIR /usr/src/backend
 
