@@ -84,7 +84,9 @@ async def patch_check_in_account(
     current_admin: admins_model.TokenData = Depends(get_current_admin) 
 ):
     try:
-        await check_in_accounts_service.update_check_in_account(check_in_account_id,check_in_account)
+        result = await check_in_accounts_service.update_check_in_account(check_in_account_id,check_in_account)
+        if not result:
+            raise ValueError("Check in account login fail")
         return {"detail": "success"}
     except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")

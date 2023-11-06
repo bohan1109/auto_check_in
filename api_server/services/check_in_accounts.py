@@ -16,7 +16,6 @@ class CheckInAccountService:
         crawler_instance = CheckInCrawler()
         login_success = crawler_instance.login_result(check_in_account)
         if login_success:
-            
             check_in_account.login_success=True
         else:
             return False
@@ -41,13 +40,14 @@ class CheckInAccountService:
             read_check_in_account_by_account = await self._check_in_account_db.read_check_in_account_by_params("check_in_account", check_in_account.check_in_account)
             if read_check_in_account_by_account and read_check_in_account_by_account["_id"] != check_in_account_id:
                 raise ValueError("Check in account already exist")
+        
         crawler_instance = CheckInCrawler()
-        login_success = crawler_instance.login_result(check_in_account)
-        if login_success:
-            
-            check_in_account.login_success=True
-        else:
-            return False
+        if check_in_account.check_in_password != "":
+            login_success = crawler_instance.login_result(check_in_account)
+            if login_success:
+                check_in_account.login_success=True
+            else:
+                return False
         result = await self._check_in_account_db.update_check_in_account(check_in_account_id,check_in_account.dict())
         return result
     
