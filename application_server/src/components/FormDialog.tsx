@@ -22,6 +22,11 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
+    const config = {
+        headers: {
+            Authorization: `${jwtTokenType} ${jwtToken}`
+        },
+    }
     React.useEffect(() => {
         if (data?.id) {
             setCheckInAccount(data.checkInAccount);
@@ -33,11 +38,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             setCheckInUsername('');
         }
     }, [data]);
-    const config = {
-        headers: {
-            Authorization: `${jwtTokenType} ${jwtToken}`
-        },
-    }
+    
     
     const editData = ()=>{
         const updateData = {
@@ -46,8 +47,6 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             checkInUsername:checkInUsername,
         }
         const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
-        console.log(`/check-in-accounts/${data?.id}`)
-        console.log(formattedData)
         api.patch(`/check-in-accounts/${data?.id}`,formattedData,config)
         .then((response)=>{
             console.log("修改成功",response.data)
@@ -115,7 +114,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 <TextField
                     margin="normal"
                     fullWidth
-                    label="帳號"
+                    label="打卡帳號"
                     value={checkInAccount}
                     onChange={(e) => setCheckInAccount(e.target.value)}
                 />

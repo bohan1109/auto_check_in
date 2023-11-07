@@ -2,8 +2,9 @@ import * as React from 'react';
 import api from '../Axios.config'
 import DataTable from '../components/Table'
 import { Box, Button } from '@mui/material';
-import { GridColDef } from '@mui/x-data-grid';
+import { GridColDef,GridRowId } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import FormDialog from "../components/FormDialog";
 import _ from 'lodash';
 const HomePage: React.FC = () => {
@@ -14,10 +15,11 @@ const HomePage: React.FC = () => {
         checkInPassword: string; 
         checkInUsername: string; 
     }
-
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
     const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
     const [boolean, setBoolean] = React.useState(true)
+    const [formDialogOpen, setFormDialogOpen] = React.useState(false);
+
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
     const config = {
@@ -52,33 +54,55 @@ const HomePage: React.FC = () => {
             width: 150,
             renderCell: (params) => {
                 const rowData = checkInAccountData.find(item => item.id === params.id);
-                return (
+                return (<>
                     <EditIcon
                         style={{ cursor: 'pointer' }}
                         onClick={() => handleOpen(rowData)}
                     />
+                    <DeleteIcon
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleDelete(params.id)}
+                    />
+                    </>
                 );
             },
         },
 
     ];
 
-    const [dialogOpen, setDialogOpen] = React.useState(false);
+
+    const handleDelete = (id:GridRowId)=>{
+        api.delete(`/check-in-accounts/${id}`,config)
+        .then((response)=>{
+            console.log("刪除成功",response.data)
+            setBoolean(!boolean)
+        }).catch((error) => {
+            if (error.response) {
+                console.log('Error', error.response.status);
+                console.log('Error data', error.response.data);
+            } else if (error.request) {
+                console.log('Error with request', error.request);
+            } else {
+                console.log('Error', error.message);
+            }
+            console.log(error.config);
+        })
+    }
 
     const handleOpen = (data?: CheckInAccount) => {
         if (data) {
             setDataToPass(data);
-            setDialogOpen(true);
+            setFormDialogOpen(true);
         } else {
             setDataToPass(undefined);
         }
-        setDialogOpen(true);
+        setFormDialogOpen(true);
     };
-    const handleClose = () => setDialogOpen(false);
+    const handleClose = () => setFormDialogOpen(false);
 
     const handleAddNew = () => {
         setDataToPass(undefined);
-        setDialogOpen(true);
+        setFormDialogOpen(true);
     };
     
 
@@ -103,7 +127,7 @@ const HomePage: React.FC = () => {
         <>
         <FormDialog
                 title="填寫資料"
-                open={dialogOpen}
+                open={formDialogOpen}
                 handleClose={handleClose}
                 data={dataToPass}
                 boolean={boolean}
