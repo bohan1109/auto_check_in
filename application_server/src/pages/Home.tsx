@@ -19,7 +19,7 @@ const HomePage: React.FC = () => {
     const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
     const [boolean, setBoolean] = React.useState(true)
     const [formDialogOpen, setFormDialogOpen] = React.useState(false);
-
+    const [title,setTitle]=React.useState('')
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
     const config = {
@@ -91,6 +91,7 @@ const HomePage: React.FC = () => {
 
     const handleOpen = (data?: CheckInAccount) => {
         if (data) {
+            setTitle("修改打卡帳號")
             setDataToPass(data);
             setFormDialogOpen(true);
         } else {
@@ -101,6 +102,7 @@ const HomePage: React.FC = () => {
     const handleClose = () => setFormDialogOpen(false);
 
     const handleAddNew = () => {
+        setTitle("新增打卡帳號")
         setDataToPass(undefined);
         setFormDialogOpen(true);
     };
@@ -126,7 +128,7 @@ const HomePage: React.FC = () => {
     return (
         <>
         <FormDialog
-                title="填寫資料"
+                title={title}
                 open={formDialogOpen}
                 handleClose={handleClose}
                 data={dataToPass}
