@@ -22,22 +22,22 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
-    React.useEffect(() => {
-        if (data?.id) {
-            setCheckInAccount(data.checkInAccount);
-            setCheckInUsername(data.checkInUsername);
-        } else {
-            // 重置表单字段状态
-            setCheckInAccount('');
-            setCheckInPassword('');
-            setCheckInUsername('');
-        }
-    }, [data]);
     const config = {
         headers: {
             Authorization: `${jwtTokenType} ${jwtToken}`
         },
     }
+    React.useEffect(() => {
+        if (data?.id) {
+            setCheckInAccount(data.checkInAccount);
+            setCheckInUsername(data.checkInUsername);
+        } else {
+            setCheckInAccount('');
+            setCheckInPassword('');
+            setCheckInUsername('');
+        }
+    }, [data]);
+    
     
     const editData = ()=>{
         const updateData = {
@@ -46,8 +46,6 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             checkInUsername:checkInUsername,
         }
         const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
-        console.log(`/check-in-accounts/${data?.id}`)
-        console.log(formattedData)
         api.patch(`/check-in-accounts/${data?.id}`,formattedData,config)
         .then((response)=>{
             console.log("修改成功",response.data)
@@ -103,7 +101,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{title}</DialogTitle>
+            <DialogTitle >{title}</DialogTitle>
             <DialogContent>
                 <TextField
                     margin="normal"
@@ -115,7 +113,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 <TextField
                     margin="normal"
                     fullWidth
-                    label="帳號"
+                    label="打卡帳號"
                     value={checkInAccount}
                     onChange={(e) => setCheckInAccount(e.target.value)}
                 />
