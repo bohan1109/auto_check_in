@@ -32,7 +32,6 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             setCheckInAccount(data.checkInAccount);
             setCheckInUsername(data.checkInUsername);
         } else {
-            // 重置表单字段状态
             setCheckInAccount('');
             setCheckInPassword('');
             setCheckInUsername('');
@@ -102,7 +101,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
     return (
         <Dialog open={open} onClose={handleClose}>
-            <DialogTitle>{title}</DialogTitle>
+            <DialogTitle >{title}</DialogTitle>
             <DialogContent>
                 <TextField
                     margin="normal"

@@ -2,24 +2,29 @@ import * as React from 'react';
 import api from '../Axios.config'
 import DataTable from '../components/Table'
 import { Box, Button } from '@mui/material';
-import { GridColDef,GridRowId } from '@mui/x-data-grid';
+import { GridColDef, GridRowId } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FormDialog from "../components/FormDialog";
+import ConfirmDialog from "../components/ConfirmDialog";
 import _ from 'lodash';
 const HomePage: React.FC = () => {
     interface CheckInAccount {
-        id: string; 
-        loginSuccess: boolean; 
-        checkInAccount: string; 
-        checkInPassword: string; 
-        checkInUsername: string; 
+        id: string;
+        loginSuccess: boolean;
+        checkInAccount: string;
+        checkInPassword: string;
+        checkInUsername: string;
     }
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
     const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
     const [boolean, setBoolean] = React.useState(true)
     const [formDialogOpen, setFormDialogOpen] = React.useState(false);
-    const [title,setTitle]=React.useState('')
+    const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
+    const [description, setDescription] = React.useState('')
+    const [confirmTitle, setConfirmTitle] = React.useState('')
+    const [selectedId, setSelectedId] = React.useState<GridRowId | null>(null);
+    const [formTitle, setFormTitle] = React.useState('')
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
     const config = {
@@ -61,37 +66,53 @@ const HomePage: React.FC = () => {
                     />
                     <DeleteIcon
                         style={{ cursor: 'pointer' }}
-                        onClick={() => handleDelete(params.id)}
+                        onClick={() => handleConfirmDialogOpen(params.id)}
+                        // onClick={() => handleDelete(params.id)}
                     />
-                    </>
+                </>
                 );
             },
         },
 
     ];
 
-
-    const handleDelete = (id:GridRowId)=>{
-        api.delete(`/check-in-accounts/${id}`,config)
-        .then((response)=>{
-            console.log("刪除成功",response.data)
-            setBoolean(!boolean)
-        }).catch((error) => {
-            if (error.response) {
-                console.log('Error', error.response.status);
-                console.log('Error data', error.response.data);
-            } else if (error.request) {
-                console.log('Error with request', error.request);
-            } else {
-                console.log('Error', error.message);
-            }
-            console.log(error.config);
-        })
+    const handleConfirmDialogOpen = (id: GridRowId)=>{
+        setSelectedId(id); 
+        setConfirmDialogOpen(true);
+        setDescription('您確定要刪除這個帳號嗎？'); 
+        setConfirmTitle('刪除打卡帳號');
     }
+
+
+    const handleDelete = (id: GridRowId) => {
+        api.delete(`/check-in-accounts/${id}`, config)
+            .then((response) => {
+                console.log("刪除成功", response.data)
+                setBoolean(!boolean)
+            }).catch((error) => {
+                if (error.response) {
+                    console.log('Error', error.response.status);
+                    console.log('Error data', error.response.data);
+                } else if (error.request) {
+                    console.log('Error with request', error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
+            })
+    }
+
+    const handleConfirmDelete = () => {
+        if (selectedId !== null) {
+            handleDelete(selectedId); 
+            setConfirmDialogOpen(false); 
+            setSelectedId(null); 
+        }
+    };
 
     const handleOpen = (data?: CheckInAccount) => {
         if (data) {
-            setTitle("修改打卡帳號")
+            setFormTitle("修改打卡帳號")
             setDataToPass(data);
             setFormDialogOpen(true);
         } else {
@@ -99,14 +120,15 @@ const HomePage: React.FC = () => {
         }
         setFormDialogOpen(true);
     };
-    const handleClose = () => setFormDialogOpen(false);
+    const handleFormDialogClose = () => setFormDialogOpen(false);
+    const handleConfirmDialogClose = () => setConfirmDialogOpen(false);
 
     const handleAddNew = () => {
-        setTitle("新增打卡帳號")
+        setFormTitle("新增打卡帳號")
         setDataToPass(undefined);
         setFormDialogOpen(true);
     };
-    
+
 
 
     React.useEffect(() => {
@@ -114,9 +136,9 @@ const HomePage: React.FC = () => {
             .then((response) => {
                 const formattedData = response.data.map((item: CheckInAccount) => {
                     const camelCaseItem = _.mapKeys(item, (value, key) => _.camelCase(key));
-                    return { ...camelCaseItem, id: camelCaseItem.id }; 
+                    return { ...camelCaseItem, id: camelCaseItem.id };
                 });
-    
+
                 setCheckInAccountData(formattedData);
             }).catch(error => {
                 console.log(error)
@@ -127,16 +149,23 @@ const HomePage: React.FC = () => {
 
     return (
         <>
-        <FormDialog
-                title={title}
+            <FormDialog
+                title={formTitle}
                 open={formDialogOpen}
-                handleClose={handleClose}
+                handleClose={handleFormDialogClose}
                 data={dataToPass}
                 boolean={boolean}
                 setBoolean={setBoolean}
             />
+            <ConfirmDialog
+                title={confirmTitle}
+                open={confirmDialogOpen}
+                handleClose={handleConfirmDialogClose}
+                description={description}
+                handleConfirm={handleConfirmDelete}
+            />
             <Box m={2} mx={4}> {/* m = margin */}
-            <Button variant="contained" color="primary" onClick={handleAddNew}>
+                <Button variant="contained" color="primary" onClick={handleAddNew}>
                     新增打卡帳號
                 </Button>
             </Box>
