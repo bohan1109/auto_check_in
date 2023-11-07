@@ -46,6 +46,7 @@ class CheckInAccountService:
         password_changed = False  
         if account_data_dict['check_in_password'] == "":
             account_data_dict.pop('check_in_password', None) 
+            account_data_dict.pop('login_success', None) 
         else:
             password_changed = True 
 
@@ -56,7 +57,7 @@ class CheckInAccountService:
             encrypted_check_in_password = encryption.encrypt(check_in_account.check_in_password)
             account_data_dict["check_in_password"] = encrypted_check_in_password
             if login_success:
-                account_data_dict['login_success'] = True  # 设置成功登录标志
+                account_data_dict['login_success'] = True  
             else:
                 return False 
         result = await self._check_in_account_db.update_check_in_account(check_in_account_id,account_data_dict)
