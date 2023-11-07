@@ -12,8 +12,8 @@ const LoginPage: React.FC = () => {
     const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
     };
-    const handelLoginButton = async () => {
-        await api.post("/admins/login", {
+    const handelLoginButton = () => {
+        api.post("/admins/login", {
             account: account,
             password: password
         })
@@ -23,7 +23,15 @@ const LoginPage: React.FC = () => {
                 localStorage.setItem('jwtToken', jwtToken);    
                 navigate('/home'); 
             }).catch((error) => {
-                console.log(error)
+                if (error.response) {
+                    console.log('Error', error.response.status);
+                    console.log('Error data', error.response.data);
+                } else if (error.request) {
+                    console.log('Error with request', error.request);
+                } else {
+                    console.log('Error', error.message);
+                }
+                console.log(error.config);
             })
     }
     return (
