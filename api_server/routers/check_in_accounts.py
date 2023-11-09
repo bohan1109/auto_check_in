@@ -28,9 +28,9 @@ async def create_check_in_account(
         if result:
             return {"detail": "success"}
         else:
-            raise HTTPException(status_code=400, detail="Login fail")
+            raise ValueError("Check in account login fail")
     except HTTPException as he:
-        raise he
+        raise he    
     except ValueError as ve:  # For data validation errors
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
