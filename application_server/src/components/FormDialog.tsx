@@ -75,18 +75,26 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
         api.post(`/check-in-accounts`,formattedData,config)
         .then((response)=>{
             console.log("新增成功",response.data)
+            showSnackbar("success","打卡帳號新增成功")
             setBoolean(!boolean)
             handleClose()
         }).catch((error) => {
-            if (error.response) {
-                console.log('Error', error.response.status);
-                console.log('Error data', error.response.data);
-            } else if (error.request) {
-                console.log('Error with request', error.request);
-            } else {
-                console.log('Error', error.message);
+            const detail = error.response.data.detail
+            switch (error.response.status){
+                case 422:
+                        showSnackbar("warning","請輸入正確資料")
+                    break
+                case 400:
+                    if(detail==="Check in account already exist"){
+                    showSnackbar("error","登入帳號已經存在")
+                    }else if(detail==="Check in account login fail"){
+                        showSnackbar("error","打卡帳號登入失敗")
+                    }
+                    break
+                case 500:
+                    showSnackbar("error","伺服器錯誤請聯繫開發人員")
+                    break
             }
-            console.log(error.config);
         })
     }
 
