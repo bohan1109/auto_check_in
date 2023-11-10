@@ -117,6 +117,8 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     label="打卡帳號"
                     value={checkInAccount}
                     onChange={(e) => setCheckInAccount(e.target.value)}
+                    disabled={!!data}
+                    // {!!data}等於{data?true:false}
                 />
                 <TextField
                     margin="normal"
