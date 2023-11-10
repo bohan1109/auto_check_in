@@ -50,7 +50,7 @@ const LoginPage: React.FC = () => {
                         showSnackbar("error","帳號或密碼錯誤")
                         break
                     case 500:
-                        showSnackbar("error","伺服器錯誤請聯繫開發人員")
+                        showSnackbar("error","伺服器錯誤，請聯繫開發人員")
                         break
                 }
             })
