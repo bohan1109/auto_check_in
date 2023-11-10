@@ -14,9 +14,10 @@ interface FormDialogProps {
     handleClose: () => void;
     boolean:boolean;
     setBoolean: (value: boolean) => void;
+    showSnackbar:(severity:"error" | "warning" | "info" | "success", message:string)=>void
 }
 
-const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,boolean,setBoolean }) => {
+const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,boolean,setBoolean,showSnackbar }) => {
     const [checkInAccount, setCheckInAccount] = useState(data?.checkInAccount || '');
     const [checkInPassword, setCheckInPassword] = useState('');
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
@@ -48,7 +49,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
         const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
         api.patch(`/check-in-accounts/${data?.id}`,formattedData,config)
         .then((response)=>{
-            console.log("修改成功",response.data)
+            showSnackbar("success","修改成功")
             setBoolean(!boolean)
             handleClose()
         }).catch((error) => {
