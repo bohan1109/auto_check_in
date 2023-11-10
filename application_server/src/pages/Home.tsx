@@ -6,6 +6,7 @@ import { GridColDef, GridRowId } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FormDialog from "../components/FormDialog";
+import Snackbar from "../components/Snackbar"
 import ConfirmDialog from "../components/ConfirmDialog";
 import _ from 'lodash';
 const HomePage: React.FC = () => {
@@ -24,6 +25,9 @@ const HomePage: React.FC = () => {
     const [description, setDescription] = React.useState('')
     const [confirmTitle, setConfirmTitle] = React.useState('')
     const [selectedId, setSelectedId] = React.useState<GridRowId | null>(null);
+    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
+    const [snackDescription, setSnackDescription] = React.useState('')
     const [formTitle, setFormTitle] = React.useState('')
     const jwtToken = localStorage.getItem("jwtToken")
     const jwtTokenType = localStorage.getItem("jwtTokenType")
@@ -67,27 +71,32 @@ const HomePage: React.FC = () => {
                     <DeleteIcon
                         style={{ cursor: 'pointer' }}
                         onClick={() => handleConfirmDialogOpen(params.id)}
-                        // onClick={() => handleDelete(params.id)}
                     />
                 </>
                 );
             },
         },
-
     ];
 
-    const handleConfirmDialogOpen = (id: GridRowId)=>{
-        setSelectedId(id); 
+    const showSnackbar = (severity:"error" | "warning" | "info" | "success", message:string) => {
+        setSnackbarSeverity(severity);
+        setSnackDescription(message);
+        setSnackbarOpen(true);
+    };
+
+    const handleConfirmDialogOpen = (id: GridRowId) => {
+        setSelectedId(id);
         setConfirmDialogOpen(true);
-        setDescription('您確定要刪除這個帳號嗎？'); 
+        setDescription('您確定要刪除這個帳號嗎？');
         setConfirmTitle('刪除打卡帳號');
     }
-
 
     const handleDelete = (id: GridRowId) => {
         api.delete(`/check-in-accounts/${id}`, config)
             .then((response) => {
                 console.log("刪除成功", response.data)
+                setSnackbarOpen(true)
+                showSnackbar("success","刪除成功")
                 setBoolean(!boolean)
             }).catch((error) => {
                 if (error.response) {
@@ -104,9 +113,9 @@ const HomePage: React.FC = () => {
 
     const handleConfirmDelete = () => {
         if (selectedId !== null) {
-            handleDelete(selectedId); 
-            setConfirmDialogOpen(false); 
-            setSelectedId(null); 
+            handleDelete(selectedId);
+            setConfirmDialogOpen(false);
+            setSelectedId(null);
         }
     };
 
@@ -129,8 +138,6 @@ const HomePage: React.FC = () => {
         setFormDialogOpen(true);
     };
 
-
-
     React.useEffect(() => {
         api.get("/check-in-accounts", config)
             .then((response) => {
@@ -143,12 +150,22 @@ const HomePage: React.FC = () => {
             }).catch(error => {
                 console.log(error)
             })
-
-
     }, [boolean]);
+
+    const handleSnackbarClose = (
+        event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason !== 'clickaway') {
+            setSnackbarOpen(false);
+        }
+    };
+
+
 
     return (
         <>
+            <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
             <FormDialog
                 title={formTitle}
                 open={formDialogOpen}
@@ -156,6 +173,7 @@ const HomePage: React.FC = () => {
                 data={dataToPass}
                 boolean={boolean}
                 setBoolean={setBoolean}
+                showSnackbar={showSnackbar}
             />
             <ConfirmDialog
                 title={confirmTitle}
@@ -178,7 +196,6 @@ const HomePage: React.FC = () => {
             </Box>
         </>
     )
-
 }
 
 export default HomePage
