@@ -148,7 +148,12 @@ const HomePage: React.FC = () => {
 
                 setCheckInAccountData(formattedData);
             }).catch(error => {
+                if(error.response.status===404){
+                    setCheckInAccountData([])
+                    return
+                }
                 console.log(error)
+                
             })
     }, [boolean]);
 
