@@ -10,6 +10,13 @@ const LoginPage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+            navigate('/home');
+        }
+    }, [navigate]);
     const handleAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAccount(e.target.value);
     };
