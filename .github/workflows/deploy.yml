@@ -40,3 +40,23 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "cd /home/ubuntu/auto_check_in && git pull"
           ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "cd /home/ubuntu/auto_check_in/api_server && bash setup.sh"
+
+      - name: Build Frontend
+        env:
+          REACT_APP_BACKEND_URL: ${{ secrets.REACT_APP_BACKEND_URL }}
+        run: |
+          cd application_server
+          echo "REACT_APP_BACKEND_URL=${{ secrets.REACT_APP_BACKEND_URL }}" > .env
+          npm install
+          npm run build
+  
+      - name: Deploy Frontend to EC2
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          SSH_KEY: ${{ secrets.AWS_SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r application_server/build "$USERNAME@$HOST:/auto_check_in/application_server"
+          rm private_key.pem
