@@ -30,10 +30,9 @@ const HomePage: React.FC = () => {
     const [snackDescription, setSnackDescription] = React.useState('')
     const [formTitle, setFormTitle] = React.useState('')
     const jwtToken = localStorage.getItem("jwtToken")
-    const jwtTokenType = localStorage.getItem("jwtTokenType")
     const config = {
         headers: {
-            Authorization: `${jwtTokenType} ${jwtToken}`
+            Authorization: `Bearer ${jwtToken}`
         },
     }
 

@@ -36,7 +36,6 @@ const LoginPage: React.FC = () => {
         })
             .then((response) => {
                 const jwtToken = response.data.access_token
-                localStorage.setItem('jwtTokenType', 'Bearer'); 
                 localStorage.setItem('jwtToken', jwtToken); 
                 showSnackbar("success","登入成功")
                 setTimeout(()=>{navigate('/home')},900) 

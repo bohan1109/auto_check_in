@@ -22,10 +22,9 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const [checkInPassword, setCheckInPassword] = useState('');
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
     const jwtToken = localStorage.getItem("jwtToken")
-    const jwtTokenType = localStorage.getItem("jwtTokenType")
     const config = {
         headers: {
-            Authorization: `${jwtTokenType} ${jwtToken}`
+            Authorization: `Bearer ${jwtToken}`
         },
     }
     React.useEffect(() => {
