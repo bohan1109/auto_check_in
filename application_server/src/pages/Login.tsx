@@ -2,15 +2,39 @@ import * as React from 'react';
 import api from '../Axios.config'
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Snackbar from "../components/Snackbar"
 const LoginPage: React.FC = () => {
     const [account, setAccount] = React.useState('');
     const [password, setPassword] = React.useState('');
+    const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+    const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
+    const [snackDescription, setSnackDescription] = React.useState('')
     const navigate = useNavigate();
+
+    React.useEffect(() => {
+        const token = localStorage.getItem('jwtToken');
+        if (token) {
+            navigate('/home');
+        }
+    }, [navigate]);
     const handleAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAccount(e.target.value);
     };
     const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
+    };
+    const showSnackbar = (severity:"error" | "warning" | "info" | "success", message:string) => {
+        setSnackbarSeverity(severity);
+        setSnackDescription(message);
+        setSnackbarOpen(true);
+    };
+    const handleSnackbarClose = (
+        event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason !== 'clickaway') {
+            setSnackbarOpen(false);
+        }
     };
     const handelLoginButton = () => {
         api.post("/admins/login", {
@@ -19,22 +43,26 @@ const LoginPage: React.FC = () => {
         })
             .then((response) => {
                 const jwtToken = response.data.access_token
-                localStorage.setItem('jwtTokenType', 'Bearer'); 
-                localStorage.setItem('jwtToken', jwtToken);    
-                navigate('/home'); 
+                localStorage.setItem('jwtToken', jwtToken); 
+                showSnackbar("success","登入成功")
+                setTimeout(()=>{navigate('/home')},900) 
+                
             }).catch((error) => {
-                if (error.response) {
-                    console.log('Error', error.response.status);
-                    console.log('Error data', error.response.data);
-                } else if (error.request) {
-                    console.log('Error with request', error.request);
-                } else {
-                    console.log('Error', error.message);
+                switch (error.response.status){
+                    case 422:
+                            showSnackbar("warning","請輸入正確資料")
+                        break
+                    case 401:
+                        showSnackbar("error","帳號或密碼錯誤")
+                        break
+                    case 500:
+                        showSnackbar("error","伺服器錯誤，請聯繫開發人員")
+                        break
                 }
-                console.log(error.config);
             })
     }
-    return (
+    return (<>
+        <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
         <Grid container justifyContent="center" alignItems="center" style={{ height: '100vh' }}>
             <Grid item xs={12} sm={6} md={4}>
                 <Paper elevation={2} style={{ padding: '20px' }}>
@@ -62,6 +90,7 @@ const LoginPage: React.FC = () => {
                 </Paper>
             </Grid>
         </Grid>
+        </>
     );
 
 }

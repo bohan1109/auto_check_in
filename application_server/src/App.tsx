@@ -7,6 +7,8 @@ import {
   Route,
   Navigate
 } from "react-router-dom";
+import ProtectedRoute from './components/ProtectedRoute';
+
 type TokenContextType = {
   tokenContext: string | null;
   setTokenContext: React.Dispatch<React.SetStateAction<string | null>>;
@@ -16,15 +18,26 @@ export const TokenContext = React.createContext<TokenContextType | null>(null);
 
 const App: React.FC = () => {
   const [tokenContext, setTokenContext] = React.useState(
-    localStorage.getItem("login_token")
+    localStorage.getItem("jwtToken")
   );
+  const providerValue = React.useMemo(() => ({
+    tokenContext,
+    setTokenContext
+  }), [tokenContext]);
 
   return (
-    <TokenContext.Provider value={{ tokenContext, setTokenContext }}>
+    <TokenContext.Provider value={providerValue}>
       <Router>
         <Routes>
           <Route path="/" element={<LoginPage />} />
-          <Route path="/home" element={!tokenContext?<Home />:<Navigate to="/" replace />} />
+          <Route 
+            path="/home" 
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            } 
+          />
         </Routes>
       </Router>
     </TokenContext.Provider>

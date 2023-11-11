@@ -78,4 +78,4 @@ class CheckInAccountDB:
         if result.deleted_count > 0:
             return {"message": "Check in account successfully deleted."}
         else:
-            raise ValueError("Check in account could not be updated")
+            raise ValueError("Check in account delete fail")
