@@ -58,5 +58,6 @@ jobs:
         run: |
           echo "$SSH_KEY" > private_key.pem
           chmod 600 private_key.pem
-          scp -o StrictHostKeyChecking=no -i private_key.pem -r application_server/build "$USERNAME@$HOST:/auto_check_in/application_server"
+          ssh -o StrictHostKeyChecking=no -i private_key.pem "$USERNAME@$HOST" "mkdir -p /home/ubuntu/auto_check_in/application_server/build"
+          scp -o StrictHostKeyChecking=no -i private_key.pem -r application_server/build "$USERNAME@$HOST:/home/ubuntu/auto_check_in/application_server"
           rm private_key.pem
