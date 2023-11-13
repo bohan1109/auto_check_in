@@ -2,7 +2,6 @@ from AES_config import AES_KEY
 from cryptography.fernet import Fernet
 class Encryption:
     def __init__(self) -> None:
-        # AES_KEY = b'SWKQc1xRzNpN2LfmKOsyyIdNvU_3V-a1zBuGzcJ-7qo='
         self._fernet = Fernet(AES_KEY)
 
     def encrypt(self, data: str) -> str:

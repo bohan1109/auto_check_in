@@ -10,7 +10,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from utils.encryption import Encryption
 import time
 import logging
-# import chromedriver_autoinstaller
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 class CheckInCrawler:

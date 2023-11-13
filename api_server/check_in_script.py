@@ -9,11 +9,9 @@ import asyncio
 import logging
 from datetime import datetime
 
-# 设置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
 
-# 创建 MongoDB 客户端
 client = AsyncIOMotorClient(DatabaseConfig.MONGODB_URL)
 db = client[DatabaseConfig.DATABASE_NAME]
 async def connect_to_mongo():

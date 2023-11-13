@@ -31,7 +31,7 @@ async def create_check_in_account(
             raise ValueError("Check in account login fail")
     except HTTPException as he:
         raise he    
-    except ValueError as ve:  # For data validation errors
+    except ValueError as ve:   
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -54,7 +54,7 @@ async def create_check_in_account(
         return check_in_account_data
     except HTTPException as he:
         raise he
-    except ValueError as ve:  # For data validation errors
+    except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
     except Exception as e:
@@ -73,9 +73,6 @@ async def read_check_in_accounts(check_in_accounts_service: CheckInAccountServic
         raise he
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
-        # 開法者模式使用
-        # return {"error": str(e)}
-        # 這裡捕獲了任何其他的異常
         raise HTTPException(detail="Server error",status_code=500)
     
 @router.patch("/{check_in_account_id}")

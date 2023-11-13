@@ -21,10 +21,10 @@ class ProcessTimeMiddleware(BaseHTTPMiddleware):
         logger.info(f"Processed request in {process_time:.4f} seconds")
         return response
 app = FastAPI()
-# Add CORS middleware to your FastAPI application
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # List of allowed origins, e.g., ["http://localhost:3000"]
+    allow_origins=["*"],  
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
