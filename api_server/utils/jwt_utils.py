@@ -40,7 +40,8 @@ def get_current_admin(token: str = Depends(oauth2_scheme)) -> admins_model.Token
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    username: str = payload.get("sub")
+    username: str = payload.get("username")
+    role: str = payload.get("role")
     if username is None:
         raise HTTPException(status_code=401, detail="Invalid token")
-    return admins_model.TokenData(username=username)
+    return admins_model.TokenData(username=username,role=role)

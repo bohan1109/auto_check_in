@@ -15,7 +15,7 @@ def get_admins_service() -> AdminServiceModule.AdminService:
         
 @router.get("/protected")
 async def read_protected_route(current_admin: admins_model.TokenData = Depends(get_current_admin)):
-    return {"username": current_admin.username, "message": "Welcome to a protected route!"}
+    return {"username": current_admin.username,"role":current_admin.role, "message": "Welcome to a protected route!"}
 
 @router.get("/{admin_id}")
 async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
@@ -90,7 +90,7 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
         login_result = await admins_service.authenticate_admin(admin)
         if login_result:
             admin_data =await admins_service.fetch_admin_by_account(admin.account)
-            access_token =JWTUtilsModule.JWTUtils.create_access_token(data={"sub": admin.account})
+            access_token =JWTUtilsModule.JWTUtils.create_access_token(data={"username": admin_data["username"],"role":admin_data["role"]})
             return {"access_token": access_token, "token_type": "bearer"}
         else:
             raise HTTPException(detail="Account or password error",status_code=401)
