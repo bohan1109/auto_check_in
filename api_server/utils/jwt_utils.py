@@ -1,7 +1,7 @@
 import jwt
+from jwt import PyJWTError
 from datetime import datetime, timedelta
 from config import JWTConfig
-from models import jwt as jwt_model
 from models import admins as admins_model
 from fastapi import HTTPException,Depends
 from fastapi.security import OAuth2PasswordBearer
@@ -21,15 +21,19 @@ class JWTUtils:
         try:
             payload = jwt.decode(token, JWTConfig.JWT_SECRET, algorithms=[JWTConfig.ALGORITHM])
             return payload
-        except jwt.JWTError:
-            raise jwt_model.JWTError("Could not validate credentials")
+        except PyJWTError:
+            raise HTTPException(
+                status_code=401,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def get_current_admin(token: str = Depends(oauth2_scheme)) -> admins_model.TokenData:
     try:
         payload = JWTUtilsModule.JWTUtils.decode_jwt_token(token)
-    except jwt_model.JWTError:
+    except PyJWTError:
         raise HTTPException(
             status_code=401,
             detail="Could not validate credentials",
