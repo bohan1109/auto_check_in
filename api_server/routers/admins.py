@@ -12,8 +12,6 @@ logger = logging.getLogger(__name__)
 def get_admins_service() -> AdminServiceModule.AdminService:
     return AdminServiceModule.AdminService()
 
-
-
         
 @router.get("/protected")
 async def read_protected_route(current_admin: admins_model.TokenData = Depends(get_current_admin)):
@@ -49,7 +47,7 @@ async def read_admins(admins_service: AdminServiceModule.AdminService = Depends(
         raise HTTPException(detail="Server error",status_code=500)
 
 @router.post("")
-async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service)):
+async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
         await admins_service.create_admin(admin)
         
