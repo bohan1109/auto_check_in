@@ -1,9 +1,7 @@
 from fastapi import APIRouter
 from services import admins as AdminServiceModule
 from models import admins as admins_model
-from models import jwt as jwt_model
 from fastapi import HTTPException,Depends
-from fastapi.security import OAuth2PasswordBearer
 from utils.jwt_utils import get_current_admin
 from utils import jwt_utils as JWTUtilsModule
 router = APIRouter()
