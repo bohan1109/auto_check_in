@@ -6,6 +6,7 @@ class CheckInAccountCreate(BaseModel):
     check_in_password: str
     login_success: Optional[bool] = None
     check_in_username: str
+    owner:Optional[str] = None
 
     @validator("check_in_account", "check_in_password", "check_in_username", pre=True)
     def check_empty(cls, value):

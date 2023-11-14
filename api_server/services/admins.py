@@ -18,6 +18,9 @@ class AdminService:
     async def fetch_admin(self, admin_id: str):
         result = await self._admins_db.read_admin_by_params("_id", admin_id)
         return result
+    async def fetch_admin_by_account(self, admin_account: str):
+        result = await self._admins_db.read_admin_by_params("account", admin_account)
+        return result
 
     async def create_admin(self, admin: admin_models.AdminCreate):
         have_account = await self._admins_db.read_admin_by_params("account", admin.account)

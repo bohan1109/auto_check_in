@@ -3,7 +3,6 @@ import logging
 from fastapi import FastAPI
 from config import DatabaseConfig
 
-# Setting up the logger
 logger = logging.getLogger()
 client: AsyncIOMotorClient = None
 db = None
@@ -14,7 +13,6 @@ async def connect_to_mongo(app: FastAPI):
     client = AsyncIOMotorClient(DatabaseConfig.MONGODB_URL)
     db = client[DatabaseConfig.DATABASE_NAME]
     try:
-        # This line forces a connection and will raise an exception if the database is not available
         await db.command("serverStatus")
         logger.info("Successfully connected to MongoDB!")
     except Exception as e:

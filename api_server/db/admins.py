@@ -54,6 +54,7 @@ class AdminDB:
             "account": admin.account,
             "password": admin.password,
             "username": admin.username,
+            "role": admin.role,
         }
         new_admin = await collection.insert_one(admin_data)
         if new_admin:

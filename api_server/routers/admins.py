@@ -1,9 +1,7 @@
 from fastapi import APIRouter
 from services import admins as AdminServiceModule
 from models import admins as admins_model
-from models import jwt as jwt_model
 from fastapi import HTTPException,Depends
-from fastapi.security import OAuth2PasswordBearer
 from utils.jwt_utils import get_current_admin
 from utils import jwt_utils as JWTUtilsModule
 router = APIRouter()
@@ -14,13 +12,10 @@ logger = logging.getLogger(__name__)
 def get_admins_service() -> AdminServiceModule.AdminService:
     return AdminServiceModule.AdminService()
 
-
-
         
 @router.get("/protected")
 async def read_protected_route(current_admin: admins_model.TokenData = Depends(get_current_admin)):
-    # 如果 token 是正確的，這個路由會被執行並回傳以下的字典
-    return {"username": current_admin.username, "message": "Welcome to a protected route!"}
+    return {"username": current_admin.username,"role":current_admin.role,"account":current_admin.account, "message": "Welcome to a protected route!"}
 
 @router.get("/{admin_id}")
 async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
@@ -49,9 +44,6 @@ async def read_admins(admins_service: AdminServiceModule.AdminService = Depends(
         raise he
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
-        # 開法者模式使用
-        # return {"error": str(e)}
-        # 這裡捕獲了任何其他的異常
         raise HTTPException(detail="Server error",status_code=500)
 
 @router.post("")
@@ -97,7 +89,8 @@ async def admin_login(admin: admins_model.AdminLogin,admins_service: AdminServic
     try:
         login_result = await admins_service.authenticate_admin(admin)
         if login_result:
-            access_token =JWTUtilsModule.JWTUtils.create_access_token(data={"sub": admin.account})
+            admin_data =await admins_service.fetch_admin_by_account(admin.account)
+            access_token =JWTUtilsModule.JWTUtils.create_access_token(data={"username": admin_data["username"],"role":admin_data["role"],"account":admin_data["account"]})
             return {"access_token": access_token, "token_type": "bearer"}
         else:
             raise HTTPException(detail="Account or password error",status_code=401)
