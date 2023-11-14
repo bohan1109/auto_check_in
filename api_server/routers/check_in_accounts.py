@@ -21,10 +21,10 @@ async def create_check_in_account(
     current_admin: admins_model.TokenData = Depends(get_current_admin)    
 ):
     try:
+        check_in_account.owner=current_admin.account
         result = await check_in_accounts_service.create_check_in_account(
             check_in_account
         )
-
         if result:
             return {"detail": "success"}
         else:
