@@ -56,6 +56,9 @@ const RegisterPage: React.FC = () => {
                 
             }).catch((error) => {
                 switch (error.response.status){
+                    case 400:
+                        showSnackbar("warning","帳號已存在!")
+                        break
                     case 422:
                         if(error.response.data.detail==="Password and Confirm Password do not match"){
                             showSnackbar("warning","確認密碼錯誤")
