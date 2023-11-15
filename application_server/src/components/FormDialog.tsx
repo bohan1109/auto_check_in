@@ -2,25 +2,27 @@ import React, { useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
 import api from '../Axios.config'
 import _ from 'lodash';
+import Loading from './Loading';
 interface FormDialogProps {
     title: string;
     data?: {
-        id:string;
+        id: string;
         checkInAccount: string;
         checkInPassword: string;
         checkInUsername: string;
     };
     open: boolean;
     handleClose: () => void;
-    boolean:boolean;
+    boolean: boolean;
     setBoolean: (value: boolean) => void;
-    showSnackbar:(severity:"error" | "warning" | "info" | "success", message:string)=>void
+    showSnackbar: (severity: "error" | "warning" | "info" | "success", message: string) => void
 }
 
-const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,boolean,setBoolean,showSnackbar }) => {
+const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose, boolean, setBoolean, showSnackbar }) => {
     const [checkInAccount, setCheckInAccount] = useState(data?.checkInAccount || '');
     const [checkInPassword, setCheckInPassword] = useState('');
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
+    const [loading, setLoading] = useState(false);
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
@@ -37,73 +39,81 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             setCheckInUsername('');
         }
     }, [data]);
-    
-    
-    const editData = ()=>{
+
+
+    const editData = () => {
+        setLoading(true)
         const updateData = {
-            checkInAccount:checkInAccount,
-            checkInPassword:checkInPassword,
-            checkInUsername:checkInUsername,
+            checkInAccount: checkInAccount,
+            checkInPassword: checkInPassword,
+            checkInUsername: checkInUsername,
         }
         const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
-        api.patch(`/check-in-accounts/${data?.id}`,formattedData,config)
-        .then((response)=>{
-            showSnackbar("success","修改成功")
-            setBoolean(!boolean)
-            handleClose()
-        }).catch((error) => {
-            const detail = error.response.data.detail
-            switch (error.response.status){
-                case 422:
-                        showSnackbar("warning","請輸入正確資料")
-                    break
-                case 400:
-                    if(detail==="Check in account already exist"){
-                    showSnackbar("error","登入帳號已經存在")
-                    }else if(detail==="Check in account login fail"){
-                        showSnackbar("error","打卡帳號登入失敗")
-                    }else{
-                        showSnackbar("error","打卡帳號更新失敗，請聯繫開發人員")
-                    }
-                    break
-                case 500:
-                    showSnackbar("error","伺服器錯誤請聯繫，開發人員")
-                    break
-            }
+        api.patch(`/check-in-accounts/${data?.id}`, formattedData, config)
+            .then((response) => {
+                showSnackbar("success", "修改成功")
+                setBoolean(!boolean)
+                handleClose()
+            }).catch((error) => {
+                const detail = error.response.data.detail
+                switch (error.response.status) {
+                    case 422:
+                        showSnackbar("warning", "請輸入正確資料")
+                        break
+                    case 400:
+                        if (detail === "Check in account already exist") {
+                            showSnackbar("error", "登入帳號已經存在")
+                        } else if (detail === "Check in account login fail") {
+                            showSnackbar("error", "打卡帳號登入失敗")
+                        } else {
+                            showSnackbar("error", "打卡帳號更新失敗，請聯繫開發人員")
+                        }
+                        break
+                    case 500:
+                        showSnackbar("error", "伺服器錯誤請聯繫，開發人員")
+                        break
+                }
 
-        })
+            }).finally(() => {
+                setLoading(false)
+
+            })
     }
 
-    const createData = ()=>{
+    const createData = () => {
+        setLoading(true)
         const createData = {
-            checkInAccount:checkInAccount,
-            checkInPassword:checkInPassword,
-            checkInUsername:checkInUsername,
+            checkInAccount: checkInAccount,
+            checkInPassword: checkInPassword,
+            checkInUsername: checkInUsername,
         }
         const formattedData = _.mapKeys(createData, (value, key) => _.snakeCase(key));
-        api.post(`/check-in-accounts`,formattedData,config)
-        .then((response)=>{
-            showSnackbar("success","打卡帳號新增成功")
-            setBoolean(!boolean)
-            handleClose()
-        }).catch((error) => {
-            const detail = error.response.data.detail
-            switch (error.response.status){
-                case 422:
-                        showSnackbar("warning","請輸入正確資料")
-                    break
-                case 400:
-                    if(detail==="Check in account already exist"){
-                    showSnackbar("error","登入帳號已經存在")
-                    }else if(detail==="Check in account login fail"){
-                        showSnackbar("error","打卡帳號登入失敗")
-                    }
-                    break
-                case 500:
-                    showSnackbar("error","伺服器錯誤，請聯繫開發人員")
-                    break
-            }
-        })
+        api.post(`/check-in-accounts`, formattedData, config)
+            .then((response) => {
+                showSnackbar("success", "打卡帳號新增成功")
+                setBoolean(!boolean)
+                handleClose()
+            }).catch((error) => {
+                const detail = error.response.data.detail
+                switch (error.response.status) {
+                    case 422:
+                        showSnackbar("warning", "請輸入正確資料")
+                        break
+                    case 400:
+                        if (detail === "Check in account already exist") {
+                            showSnackbar("error", "登入帳號已經存在")
+                        } else if (detail === "Check in account login fail") {
+                            showSnackbar("error", "打卡帳號登入失敗")
+                        }
+                        break
+                    case 500:
+                        showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
+                        break
+                }
+            }).finally(() => {
+                setLoading(false)
+
+            })
     }
 
     const handleSave = () => {
@@ -118,6 +128,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
     return (
         <Dialog open={open} onClose={handleClose}>
+            <Loading loading={loading} />
             <DialogTitle >{title}</DialogTitle>
             <DialogContent>
                 <TextField
@@ -134,7 +145,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     value={checkInAccount}
                     onChange={(e) => setCheckInAccount(e.target.value)}
                     disabled={!!data}
-                    // {!!data}等於{data?true:false}
+                // {!!data}等於{data?true:false}
                 />
                 <TextField
                     margin="normal"
