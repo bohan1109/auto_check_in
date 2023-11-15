@@ -83,7 +83,6 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
         const formattedData = _.mapKeys(createData, (value, key) => _.snakeCase(key));
         api.post(`/check-in-accounts`,formattedData,config)
         .then((response)=>{
-            console.log("新增成功",response.data)
             showSnackbar("success","打卡帳號新增成功")
             setBoolean(!boolean)
             handleClose()
