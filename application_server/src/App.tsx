@@ -2,6 +2,7 @@ import React from 'react';
 import LoginPage from './pages/Login'
 import RegisterPage from './pages/Register'
 import Home from './pages/Home';
+import Admin from './pages/Admin';
 import {
   BrowserRouter as Router,
   Routes,
@@ -36,6 +37,14 @@ const App: React.FC = () => {
             element={
               <ProtectedRoute>
                 <Home />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <Admin />
               </ProtectedRoute>
             } 
           />
