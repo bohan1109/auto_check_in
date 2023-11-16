@@ -28,6 +28,7 @@ const AdminPage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
     const username = localStorage.getItem("username") || "使用者"
+    const role = localStorage.getItem("role")!
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
@@ -159,7 +160,7 @@ const AdminPage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            <AppBar title='自動打卡系統' onLogout={onLogout} username={username}/>
+            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role}/>
             <ConfirmDialog
                 title={confirmTitle}
                 open={confirmDialogOpen}

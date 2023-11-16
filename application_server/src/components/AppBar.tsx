@@ -5,11 +5,12 @@ interface AppBarProps {
     title: string;
     onLogout: () => void;
     username:string
+    role?:string
 }
 
 
 
-const CustomAppBar: React.FC<AppBarProps> = ({ title, onLogout,username }) => {
+const CustomAppBar: React.FC<AppBarProps> = ({ title, onLogout,username,role }) => {
     const navigate = useNavigate();
     const navigateAdminPage = ()=>{
         navigate('/admin')
@@ -24,7 +25,7 @@ const CustomAppBar: React.FC<AppBarProps> = ({ title, onLogout,username }) => {
                     {title}
                 </Typography>
                 <Button color="inherit" onClick={navigateHomePage}>首頁</Button>
-                <Button color="inherit" onClick={navigateAdminPage}>系統帳號列表</Button>
+                {role==="admin"&&<Button color="inherit" onClick={navigateAdminPage}>系統帳號列表</Button>}
                 <Typography color="inherit">{username} 你好!</Typography>
                 <Button color="inherit" onClick={onLogout}>登出</Button>
             </Toolbar>
