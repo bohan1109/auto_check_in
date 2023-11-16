@@ -18,6 +18,7 @@ const HomePage: React.FC = () => {
         checkInAccount: string;
         checkInPassword: string;
         checkInUsername: string;
+        owner: string;
     }
     const navigate = useNavigate();
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
@@ -66,17 +67,24 @@ const HomePage: React.FC = () => {
             width: 150,
             renderCell: (params) => {
                 const rowData = checkInAccountData.find(item => item.id === params.id);
-                return (<>
-                    <EditIcon
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => handleOpen(rowData)}
-                    />
-                    <DeleteIcon
-                        style={{ cursor: 'pointer' }}
-                        onClick={() => handleConfirmDialogOpen(params.id)}
-                    />
-                </>
-                );
+                const account = localStorage.getItem("account")
+                const role = localStorage.getItem("role")
+                if ((rowData && rowData.owner === account) || role==="admin") {
+                    return (
+                        <>
+                            <EditIcon
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => handleOpen(rowData)}
+                            />
+                            <DeleteIcon
+                                style={{ cursor: 'pointer' }}
+                                onClick={() => handleConfirmDialogOpen(params.id)}
+                            />
+                        </>
+                    );
+                } else {
+                    return null;
+                }
             },
         },
     ];
