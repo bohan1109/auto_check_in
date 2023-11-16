@@ -23,7 +23,7 @@ const LoginPage: React.FC = () => {
     const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
     };
-    const showSnackbar = (severity:"error" | "warning" | "info" | "success", message:string) => {
+    const showSnackbar = (severity: "error" | "warning" | "info" | "success", message: string) => {
         setSnackbarSeverity(severity);
         setSnackDescription(message);
         setSnackbarOpen(true);
@@ -43,25 +43,43 @@ const LoginPage: React.FC = () => {
         })
             .then((response) => {
                 const jwtToken = response.data.access_token
-                localStorage.setItem('jwtToken', jwtToken); 
-                showSnackbar("success","登入成功")
-                setTimeout(()=>{navigate('/home')},900) 
-                
+                localStorage.setItem('jwtToken', jwtToken);
+                getTokenContent()
+                showSnackbar("success", "登入成功")
+                setTimeout(() => { navigate('/home') }, 900)
+
             }).catch((error) => {
-                switch (error.response.status){
+                switch (error.response.status) {
                     case 422:
-                            showSnackbar("warning","請輸入正確資料")
+                        showSnackbar("warning", "請輸入正確資料")
                         break
                     case 401:
-                        showSnackbar("error","帳號或密碼錯誤")
+                        showSnackbar("error", "帳號或密碼錯誤")
                         break
                     case 500:
-                        showSnackbar("error","伺服器錯誤，請聯繫開發人員")
+                        showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
                         break
                 }
             })
     }
-    const handelRegisterButton =()=>{
+    const getTokenContent = () => {
+        const jwtToken = localStorage.getItem("jwtToken")
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`
+                    },
+                }
+        api.get('/admins/protected', config)
+        .then((response)=>{
+            const responseData = response.data
+            localStorage.setItem('username', responseData.username);
+            localStorage.setItem('role', responseData.role);
+            localStorage.setItem('account', responseData.account);
+        }).catch(()=>{
+            showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
+        })
+    }
+    const handelRegisterButton = () => {
         navigate('/register');
     }
     return (<>
@@ -96,7 +114,7 @@ const LoginPage: React.FC = () => {
                 </Paper>
             </Grid>
         </Grid>
-        </>
+    </>
     );
 
 }
