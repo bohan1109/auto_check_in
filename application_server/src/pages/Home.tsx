@@ -7,7 +7,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FormDialog from "../components/FormDialog";
 import Snackbar from "../components/Snackbar"
+import AppBar from "../components/AppBar"
 import ConfirmDialog from "../components/ConfirmDialog";
+import { useNavigate } from 'react-router-dom';
 import _ from 'lodash';
 const HomePage: React.FC = () => {
     interface CheckInAccount {
@@ -17,6 +19,7 @@ const HomePage: React.FC = () => {
         checkInPassword: string;
         checkInUsername: string;
     }
+    const navigate = useNavigate();
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
     const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
     const [boolean, setBoolean] = React.useState(true)
@@ -29,6 +32,7 @@ const HomePage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
     const [formTitle, setFormTitle] = React.useState('')
+    const username = localStorage.getItem("username") || "使用者"
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
@@ -138,7 +142,10 @@ const HomePage: React.FC = () => {
         setDataToPass(undefined);
         setFormDialogOpen(true);
     };
-
+    const onLogout = ()=>{
+        localStorage.clear()
+        navigate('/')
+    }
     React.useEffect(() => {
         api.get("/check-in-accounts", config)
             .then((response) => {
@@ -173,6 +180,7 @@ const HomePage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
+            <AppBar title='自動打卡系統' onLogout={onLogout} username={username}/>
             <FormDialog
                 title={formTitle}
                 open={formDialogOpen}
