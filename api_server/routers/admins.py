@@ -15,8 +15,17 @@ def get_admins_service() -> AdminServiceModule.AdminService:
         
 @router.get("/protected")
 async def read_protected_route(current_admin: admins_model.TokenData = Depends(get_current_admin)):
-    return {"username": current_admin.username,"role":current_admin.role,"account":current_admin.account, "message": "Welcome to a protected route!"}
-
+    try:
+        return {"username": current_admin.username,"role":current_admin.role,"account":current_admin.account, "message": "Welcome to a protected route!"}
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        # 開法者模式使用
+        # return {"error": str(e)}
+        # 這裡捕獲了任何其他的異常
+        raise HTTPException(detail="Server error",status_code=500)
+    
 @router.get("/{admin_id}")
 async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
