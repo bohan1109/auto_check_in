@@ -9,6 +9,7 @@ import {
   Route,
 } from "react-router-dom";
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 type TokenContextType = {
   tokenContext: string | null;
@@ -21,6 +22,8 @@ const App: React.FC = () => {
   const [tokenContext, setTokenContext] = React.useState(
     localStorage.getItem("jwtToken")
   );
+  const role = localStorage.getItem("role")
+  
   const providerValue = React.useMemo(() => ({
     tokenContext,
     setTokenContext
@@ -43,9 +46,9 @@ const App: React.FC = () => {
           <Route 
             path="/admin" 
             element={
-              <ProtectedRoute>
+              <AdminRoute role={role}>
                 <Admin />
-              </ProtectedRoute>
+              </AdminRoute>
             } 
           />
         </Routes>
