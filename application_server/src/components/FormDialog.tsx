@@ -48,6 +48,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
     const editData = () => {
         setLoading(true)
+        
         const updateData = {
             checkInAccount: checkInAccount,
             checkInPassword: checkInPassword,
@@ -141,10 +142,30 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const checkInTimes = createTimeOptions(8, 30, 9, 0, 5);
     const checkOutTimes = createTimeOptions(18, 0, 18, 30, 5);
     const handleSave = () => {
+
         if (data) {
+            const isDataUnchanged = data &&
+            checkInAccount === data.checkInAccount &&
+            checkInUsername === data.checkInUsername &&
+            checkInTime === data.checkInTime &&
+            checkOutTime === data.checkOutTime;
+    
+        if (isDataUnchanged) {
+            handleClose();
+            return;
+        }
             editData();
             console.log("update")
         } else {
+            const isDataIncomplete = 
+            checkInAccount === "" &&
+            checkInPassword === "" &&
+            checkInUsername === "";
+        
+        if (isDataIncomplete) {
+            handleClose();
+            return;
+        }
             console.log("create")
             createData();
         }
