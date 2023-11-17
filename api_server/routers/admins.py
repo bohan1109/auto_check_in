@@ -88,11 +88,15 @@ async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_serv
 @router.delete("/{admin_id}")
 async def delete_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
+        if current_admin.role!="admin":
+            raise HTTPException(status_code=403, detail="Permission denied")
         await admins_service.delete_admin(admin_id)
         return {"detail": "success"}
     except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
+    except HTTPException as he:
+        raise he
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error",status_code=500)
