@@ -41,6 +41,8 @@ class AdminService:
 
         if admin.username:
             admin_data["username"] = admin.username
+        if admin.role:
+            admin_data["role"] = admin.role
         result = await self._admins_db.update_admin(admin_id, admin_data)
         return result
     
