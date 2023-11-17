@@ -33,7 +33,6 @@ class AdminService:
 
     async def update_admin(self, admin_id: str, admin: admin_models.AdminUpdate):
         admin_data = {}
-    
         if admin.password:
             password_bytes = admin.password.encode("utf-8")
             hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())

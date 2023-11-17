@@ -72,11 +72,15 @@ async def create_admin(admin: admins_model.AdminCreate,admins_service: AdminServ
 @router.patch("/{admin_id}")
 async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
+        if admin.role and current_admin.role!="admin":
+            raise HTTPException(status_code=403, detail="Permission denied")
         await admins_service.update_admin(admin_id,admin)
         return {"detail": "success"}
     except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
+    except HTTPException as he:
+        raise he
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
