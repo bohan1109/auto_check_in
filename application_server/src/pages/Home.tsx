@@ -35,6 +35,7 @@ const HomePage: React.FC = () => {
     const [formTitle, setFormTitle] = React.useState('')
     const username = localStorage.getItem("username") || "使用者"
     const jwtToken = localStorage.getItem("jwtToken")
+    const role = localStorage.getItem("role")!
     const config = {
         headers: {
             Authorization: `Bearer ${jwtToken}`
@@ -188,7 +189,7 @@ const HomePage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            <AppBar title='自動打卡系統' onLogout={onLogout} username={username}/>
+            {role==="admin"&&<AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role}/>}
             <FormDialog
                 title={formTitle}
                 open={formDialogOpen}
