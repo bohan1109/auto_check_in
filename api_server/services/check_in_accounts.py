@@ -27,7 +27,7 @@ class CheckInAccountService:
         result = await self._check_in_account_db.create_check_in_account(check_in_account)
         return result
     
-    async def fetch_check_in_account(self,check_in_account_id:str):
+    async def fetch_check_in_account_by_id(self,check_in_account_id:str):
         result = await self._check_in_account_db.read_check_in_account_by_params("_id",check_in_account_id)
         return result
     
