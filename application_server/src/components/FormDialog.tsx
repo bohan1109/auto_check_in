@@ -65,6 +65,9 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             }).catch((error) => {
                 const detail = error.response.data.detail
                 switch (error.response.status) {
+                    case 403:
+                        showSnackbar("warning", "權限錯誤")
+                        break
                     case 422:
                         showSnackbar("warning", "請輸入正確資料")
                         break

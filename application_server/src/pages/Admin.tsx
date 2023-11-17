@@ -46,7 +46,7 @@ const AdminPage: React.FC = () => {
             return admin;
         });
         setAdminData(updatedAdminData);
-    
+
         const newUnsavedRoles = new Set(unsavedRoles);
         if (updatedAdminData.find(admin => admin.id === id)?.originalRole !== newRole) {
             newUnsavedRoles.add(id);
@@ -73,6 +73,9 @@ const AdminPage: React.FC = () => {
                     switch (error.response.status) {
                         case 400:
                             showSnackbar("error", "更新失敗");
+                            break
+                        case 403:
+                            showSnackbar("warning", "權限錯誤")
                             break
                         case 422:
                             showSnackbar("error", "請輸入正確資料");
@@ -173,6 +176,9 @@ const AdminPage: React.FC = () => {
                     case 422:
                         showSnackbar("warning", "請輸入正確資料")
                         break
+                    case 403:
+                        showSnackbar("warning", "權限錯誤")
+                        break
                     case 400:
                         showSnackbar("error", "系統帳號刪除失敗，請確認帳號是否存在")
                         break
@@ -202,7 +208,7 @@ const AdminPage: React.FC = () => {
             .then((response) => {
                 const formattedData = response.data.map((item: Admin) => {
                     const camelCaseItem = _.mapKeys(item, (value, key) => _.camelCase(key));
-                    return { ...camelCaseItem, id: camelCaseItem.id, originalRole: camelCaseItem.role  };
+                    return { ...camelCaseItem, id: camelCaseItem.id, originalRole: camelCaseItem.role };
                 });
 
                 setAdminData(formattedData);

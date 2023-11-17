@@ -131,6 +131,9 @@ const HomePage: React.FC = () => {
                     case 400:
                         showSnackbar("error", "打卡帳號刪除失敗，請確認帳號是否存在")
                         break
+                    case 403:
+                        showSnackbar("warning", "權限錯誤")
+                        break
                     case 500:
                         showSnackbar("error", "伺服器錯誤請聯繫，開發人員")
                         break
