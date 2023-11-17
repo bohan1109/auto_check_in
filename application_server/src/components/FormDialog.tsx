@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem } from '@mui/material';
 import api from '../Axios.config'
 import _ from 'lodash';
 import Loading from './Loading';
@@ -10,6 +10,8 @@ interface FormDialogProps {
         checkInAccount: string;
         checkInPassword: string;
         checkInUsername: string;
+        checkInTime: string;
+        checkOutTime: string;
     };
     open: boolean;
     handleClose: () => void;
@@ -23,6 +25,9 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const [checkInPassword, setCheckInPassword] = useState('');
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
     const [loading, setLoading] = useState(false);
+    const [checkInTime, setCheckInTime] = useState(data?.checkInTime||'08:30');
+    const [checkOutTime, setCheckOutTime] = useState(data?.checkOutTime||'18:05');
+
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
@@ -47,6 +52,8 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             checkInAccount: checkInAccount,
             checkInPassword: checkInPassword,
             checkInUsername: checkInUsername,
+            checkInTime: checkInTime,
+            checkOutTime: checkOutTime,
         }
         const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
         api.patch(`/check-in-accounts/${data?.id}`, formattedData, config)
@@ -86,6 +93,8 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             checkInAccount: checkInAccount,
             checkInPassword: checkInPassword,
             checkInUsername: checkInUsername,
+            checkInTime: checkInTime,
+            checkOutTime: checkOutTime,
         }
         const formattedData = _.mapKeys(createData, (value, key) => _.snakeCase(key));
         api.post(`/check-in-accounts`, formattedData, config)
@@ -116,6 +125,21 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             })
     }
 
+    const createTimeOptions = (startHour:number, startMinute:number, endHour:number, endMinute:number, interval:number) => {
+        let times = [];
+        let currentTime = new Date(0, 0, 0, startHour, startMinute, 0);
+    
+        while (currentTime.getHours() < endHour || (currentTime.getHours() === endHour && currentTime.getMinutes() <= endMinute)) {
+            let time = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+            times.push(time);
+            currentTime = new Date(currentTime.getTime() + interval * 60000);
+        }
+    
+        return times;
+    };
+    
+    const checkInTimes = createTimeOptions(8, 30, 9, 0, 5);
+    const checkOutTimes = createTimeOptions(18, 0, 18, 30, 5);
     const handleSave = () => {
         if (data) {
             editData();
@@ -125,6 +149,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             createData();
         }
     };
+
 
     return (
         <Dialog open={open} onClose={handleClose}>
@@ -155,6 +180,29 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     value={checkInPassword}
                     onChange={(e) => setCheckInPassword(e.target.value)}
                 />
+                <Select
+                    value={checkInTime}
+                    onChange={(e) => setCheckInTime(e.target.value)}
+                    fullWidth
+                    margin="dense"
+                    style={{ marginTop: '16px' }}
+                >
+                    {checkInTimes.map(time => (
+                        <MenuItem key={time} value={time}>{time}</MenuItem>
+                    ))}
+                </Select>
+                <Select
+                    value={checkOutTime}
+                    onChange={(e) => setCheckOutTime(e.target.value)}
+                    fullWidth
+                    margin="dense"
+                    style={{ marginTop: '16px' }}
+                >
+                    {checkOutTimes.map(time => (
+                        <MenuItem key={time} value={time}>{time}</MenuItem>
+                    ))}
+                </Select>
+
 
             </DialogContent>
             <DialogActions>
