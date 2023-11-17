@@ -1,13 +1,14 @@
 import * as React from 'react';
 import api from '../Axios.config'
 import DataTable from '../components/Table'
-import { Box } from '@mui/material';
+import { Box, Select, MenuItem } from '@mui/material';
 import { GridColDef, GridRowId } from '@mui/x-data-grid';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from "../components/Snackbar"
 import AppBar from "../components/AppBar"
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useNavigate } from 'react-router-dom';
+import CheckIcon from '@mui/icons-material/Check';
 import _ from 'lodash';
 const AdminPage: React.FC = () => {
     interface Admin {
@@ -15,7 +16,8 @@ const AdminPage: React.FC = () => {
         account: string;
         password: string;
         username: string;
-        role:string
+        role: string
+        originalRole?: string;
     }
     const navigate = useNavigate();
     const [adminData, setAdminData] = React.useState<Admin[]>([])
@@ -27,6 +29,7 @@ const AdminPage: React.FC = () => {
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
+    const [unsavedRoles, setUnsavedRoles] = React.useState<Set<GridRowId>>(new Set());
     const username = localStorage.getItem("username") || "使用者"
     const role = localStorage.getItem("role")!
     const jwtToken = localStorage.getItem("jwtToken")
@@ -35,6 +38,53 @@ const AdminPage: React.FC = () => {
             Authorization: `Bearer ${jwtToken}`
         },
     }
+    const handleRoleChange = (id: GridRowId, newRole: string) => {
+        const updatedAdminData = adminData.map((admin) => {
+            if (admin.id === id) {
+                return { ...admin, role: newRole };
+            }
+            return admin;
+        });
+        setAdminData(updatedAdminData);
+    
+        const newUnsavedRoles = new Set(unsavedRoles);
+        if (updatedAdminData.find(admin => admin.id === id)?.originalRole !== newRole) {
+            newUnsavedRoles.add(id);
+        } else {
+            newUnsavedRoles.delete(id);
+        }
+        setUnsavedRoles(newUnsavedRoles);
+    };
+
+    const handleSave = (id: GridRowId) => {
+        const adminToUpdate = adminData.find((admin) => admin.id === id);
+        if (adminToUpdate) {
+            api.patch(`/admins/${id}`, { role: adminToUpdate.role }, config)
+                .then((response) => {
+                    const newUnsavedRoles = new Set(unsavedRoles);
+                    newUnsavedRoles.delete(id);
+                    setUnsavedRoles(newUnsavedRoles);
+                    showSnackbar("success", "更新成功");
+                    setBoolean(!boolean)
+                })
+                .catch((error) => {
+                    console.log(error.response.status)
+                    console.log(error.response.data.detail)
+                    switch (error.response.status) {
+                        case 400:
+                            showSnackbar("error", "更新失敗");
+                            break
+                        case 422:
+                            showSnackbar("error", "請輸入正確資料");
+                            break
+                        case 500:
+                            showSnackbar("error", "伺服器錯誤請聯繫，開發人員")
+                            break
+                    }
+
+                });
+        }
+    };
 
     const columns: GridColDef[] = [
         {
@@ -60,18 +110,39 @@ const AdminPage: React.FC = () => {
             field: 'role',
             headerName: '權限',
             width: 110,
-        },  
+            renderCell: (params) => {
+                return (
+                    <Select
+                        value={params.value}
+                        onChange={(event) => {
+                            handleRoleChange(params.id, event.target.value);
+                        }}
+                    >
+                        <MenuItem value="admin">admin</MenuItem>
+                        <MenuItem value="user">user</MenuItem>
+                    </Select>
+                );
+            },
+        },
         {
             field: 'action',
             headerName: '操作',
             sortable: false,
             width: 150,
             renderCell: (params) => {
-                return (
+                return (<>
+                    {unsavedRoles.has(params.id) && (
+                        <CheckIcon
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleSave(params.id)}
+                        />
+                    )}
+
                     <DeleteIcon
                         style={{ cursor: 'pointer' }}
                         onClick={() => handleConfirmDialogOpen(params.id)}
                     />
+                </>
                 );
             },
         },
@@ -122,7 +193,7 @@ const AdminPage: React.FC = () => {
 
     const handleConfirmDialogClose = () => setConfirmDialogOpen(false);
 
-    const onLogout = ()=>{
+    const onLogout = () => {
         localStorage.clear()
         navigate('/')
     }
@@ -131,7 +202,7 @@ const AdminPage: React.FC = () => {
             .then((response) => {
                 const formattedData = response.data.map((item: Admin) => {
                     const camelCaseItem = _.mapKeys(item, (value, key) => _.camelCase(key));
-                    return { ...camelCaseItem, id: camelCaseItem.id };
+                    return { ...camelCaseItem, id: camelCaseItem.id, originalRole: camelCaseItem.role  };
                 });
 
                 setAdminData(formattedData);
@@ -160,7 +231,7 @@ const AdminPage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role}/>
+            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />
             <ConfirmDialog
                 title={confirmTitle}
                 open={confirmDialogOpen}
