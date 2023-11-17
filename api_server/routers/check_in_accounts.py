@@ -106,11 +106,16 @@ async def delete_check_in_account(
     current_admin: admins_model.TokenData = Depends(get_current_admin) 
 ):
     try:
+        check_in_account_data =await check_in_accounts_service.fetch_check_in_account_by_id(check_in_account_id)
+        if check_in_account_data['owner'] != current_admin.account or current_admin.role!="admin":
+            raise HTTPException(status_code=403, detail="Permission denied")
         await check_in_accounts_service.delete_check_in_account(check_in_account_id)
         return {"detail": "success"}
     except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
+    except HTTPException as he:
+        raise he
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(detail="Server error", status_code=500)
