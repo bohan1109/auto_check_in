@@ -18,6 +18,8 @@ const HomePage: React.FC = () => {
         checkInAccount: string;
         checkInPassword: string;
         checkInUsername: string;
+        checkInTime: string;
+        checkOutTime: string;
         owner: string;
     }
     const navigate = useNavigate();
@@ -61,7 +63,18 @@ const HomePage: React.FC = () => {
             field: 'checkInUsername',
             headerName: '使用者',
             width: 110,
-        }, {
+        },
+        {
+            field: 'checkInTime',
+            headerName: '上班打卡時間',
+            width: 120,
+        },
+        {
+            field: 'checkOutTime',
+            headerName: '下班打卡時間',
+            width: 120,
+        },
+        {
             field: 'action',
             headerName: '操作',
             sortable: false,
@@ -70,7 +83,7 @@ const HomePage: React.FC = () => {
                 const rowData = checkInAccountData.find(item => item.id === params.id);
                 const account = localStorage.getItem("account")
                 const role = localStorage.getItem("role")
-                if ((rowData && rowData.owner === account) || role==="admin") {
+                if ((rowData && rowData.owner === account) || role === "admin") {
                     return (
                         <>
                             <EditIcon
@@ -151,7 +164,7 @@ const HomePage: React.FC = () => {
         setDataToPass(undefined);
         setFormDialogOpen(true);
     };
-    const onLogout = ()=>{
+    const onLogout = () => {
         localStorage.clear()
         navigate('/')
     }
@@ -189,7 +202,7 @@ const HomePage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            {role==="admin"&&<AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role}/>}
+            {role === "admin" && <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />}
             <FormDialog
                 title={formTitle}
                 open={formDialogOpen}
