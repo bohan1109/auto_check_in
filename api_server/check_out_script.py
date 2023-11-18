@@ -38,7 +38,7 @@ async def main():
     formatted_time = f"{hours:02d}:{minutes:02d}"
     collection = db.check_in_accounts
     logger.info("Fetching check-in accounts...")
-    check_in_accounts = await collection.find({"check_in_time":formatted_time}).to_list(length=1000)
+    check_in_accounts = await collection.find({"check_out_time":formatted_time}).to_list(length=1000)
     logger.info(f"Found {len(check_in_accounts)} check-in accounts.")
     no_check_in_holidays = [
         datetime(2024, 1, 1).date(),

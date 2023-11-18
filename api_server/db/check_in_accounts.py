@@ -25,7 +25,16 @@ class CheckInAccountDB:
             
     async def create_check_in_account(self,check_in_account:CheckInAccountCreate):
         collection = self.db.check_in_accounts
-        new_check_in_account = await collection.insert_one(check_in_account.dict())
+        check_in_account_data = {
+            "check_in_username": check_in_account.check_in_username,
+            "check_in_account": check_in_account.check_in_account,
+            "check_in_password": check_in_account.check_in_password,
+            "check_in_time": check_in_account.check_in_time,
+            "check_out_time": check_in_account.check_out_time,
+            "login_success": check_in_account.login_success,
+            "owner": check_in_account.owner,
+        }
+        new_check_in_account = await collection.insert_one(check_in_account_data)
         if new_check_in_account:
             return check_in_account
         else:

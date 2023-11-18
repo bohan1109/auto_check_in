@@ -45,4 +45,8 @@ def get_current_admin(token: str = Depends(oauth2_scheme)) -> admins_model.Token
     account: str = payload.get("account")
     if username is None:
         raise HTTPException(status_code=401, detail="Invalid token")
+    if role is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    if account is None:
+        raise HTTPException(status_code=401, detail="Invalid token")
     return admins_model.TokenData(username=username,role=role,account=account)

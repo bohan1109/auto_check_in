@@ -1,32 +1,27 @@
 import * as React from 'react';
 import api from '../Axios.config'
 import DataTable from '../components/Table'
-import { Box, Button } from '@mui/material';
+import { Box, Select, MenuItem } from '@mui/material';
 import { GridColDef, GridRowId } from '@mui/x-data-grid';
-import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FormDialog from "../components/FormDialog";
 import Snackbar from "../components/Snackbar"
 import AppBar from "../components/AppBar"
 import ConfirmDialog from "../components/ConfirmDialog";
 import { useNavigate } from 'react-router-dom';
+import CheckIcon from '@mui/icons-material/Check';
 import _ from 'lodash';
-const HomePage: React.FC = () => {
-    interface CheckInAccount {
+const AdminPage: React.FC = () => {
+    interface Admin {
         id: string;
-        loginSuccess: boolean;
-        checkInAccount: string;
-        checkInPassword: string;
-        checkInUsername: string;
-        checkInTime: string;
-        checkOutTime: string;
-        owner: string;
+        account: string;
+        password: string;
+        username: string;
+        role: string
+        originalRole?: string;
     }
     const navigate = useNavigate();
-    const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
-    const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
+    const [adminData, setAdminData] = React.useState<Admin[]>([])
     const [boolean, setBoolean] = React.useState(true)
-    const [formDialogOpen, setFormDialogOpen] = React.useState(false);
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
     const [description, setDescription] = React.useState('')
     const [confirmTitle, setConfirmTitle] = React.useState('')
@@ -34,24 +29,74 @@ const HomePage: React.FC = () => {
     const [snackbarOpen, setSnackbarOpen] = React.useState(false);
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
-    const [formTitle, setFormTitle] = React.useState('')
+    const [unsavedRoles, setUnsavedRoles] = React.useState<Set<GridRowId>>(new Set());
     const username = localStorage.getItem("username") || "使用者"
-    const jwtToken = localStorage.getItem("jwtToken")
     const role = localStorage.getItem("role")!
+    const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
             Authorization: `Bearer ${jwtToken}`
         },
     }
+    const handleRoleChange = (id: GridRowId, newRole: string) => {
+        const updatedAdminData = adminData.map((admin) => {
+            if (admin.id === id) {
+                return { ...admin, role: newRole };
+            }
+            return admin;
+        });
+        setAdminData(updatedAdminData);
+
+        const newUnsavedRoles = new Set(unsavedRoles);
+        if (updatedAdminData.find(admin => admin.id === id)?.originalRole !== newRole) {
+            newUnsavedRoles.add(id);
+        } else {
+            newUnsavedRoles.delete(id);
+        }
+        setUnsavedRoles(newUnsavedRoles);
+    };
+
+    const handleSave = (id: GridRowId) => {
+        const adminToUpdate = adminData.find((admin) => admin.id === id);
+        if (adminToUpdate) {
+            api.patch(`/admins/${id}`, { role: adminToUpdate.role }, config)
+                .then((response) => {
+                    const newUnsavedRoles = new Set(unsavedRoles);
+                    newUnsavedRoles.delete(id);
+                    setUnsavedRoles(newUnsavedRoles);
+                    showSnackbar("success", "更新成功");
+                    setBoolean(!boolean)
+                })
+                .catch((error) => {
+                    console.log(error.response.status)
+                    console.log(error.response.data.detail)
+                    switch (error.response.status) {
+                        case 400:
+                            showSnackbar("error", "更新失敗");
+                            break
+                        case 403:
+                            showSnackbar("warning", "權限錯誤")
+                            break
+                        case 422:
+                            showSnackbar("error", "請輸入正確資料");
+                            break
+                        case 500:
+                            showSnackbar("error", "伺服器錯誤請聯繫，開發人員")
+                            break
+                    }
+
+                });
+        }
+    };
 
     const columns: GridColDef[] = [
         {
-            field: 'checkInAccount',
-            headerName: '打卡帳號',
+            field: 'account',
+            headerName: '系統帳號',
             width: 150,
         },
         {
-            field: 'checkInPassword',
+            field: 'password',
             headerName: '密碼',
             width: 150,
             renderCell: () => {
@@ -60,19 +105,27 @@ const HomePage: React.FC = () => {
             }
         },
         {
-            field: 'checkInUsername',
+            field: 'username',
             headerName: '使用者',
             width: 110,
         },
         {
-            field: 'checkInTime',
-            headerName: '上班打卡時間',
-            width: 120,
-        },
-        {
-            field: 'checkOutTime',
-            headerName: '下班打卡時間',
-            width: 120,
+            field: 'role',
+            headerName: '權限',
+            width: 110,
+            renderCell: (params) => {
+                return (
+                    <Select
+                        value={params.value}
+                        onChange={(event) => {
+                            handleRoleChange(params.id, event.target.value);
+                        }}
+                    >
+                        <MenuItem value="admin">admin</MenuItem>
+                        <MenuItem value="user">user</MenuItem>
+                    </Select>
+                );
+            },
         },
         {
             field: 'action',
@@ -80,25 +133,20 @@ const HomePage: React.FC = () => {
             sortable: false,
             width: 150,
             renderCell: (params) => {
-                const rowData = checkInAccountData.find(item => item.id === params.id);
-                const account = localStorage.getItem("account")
-                const role = localStorage.getItem("role")
-                if ((rowData && rowData.owner === account) || role === "admin") {
-                    return (
-                        <>
-                            <EditIcon
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => handleOpen(rowData)}
-                            />
-                            <DeleteIcon
-                                style={{ cursor: 'pointer' }}
-                                onClick={() => handleConfirmDialogOpen(params.id)}
-                            />
-                        </>
-                    );
-                } else {
-                    return null;
-                }
+                return (<>
+                    {unsavedRoles.has(params.id) && (
+                        <CheckIcon
+                            style={{ cursor: 'pointer' }}
+                            onClick={() => handleSave(params.id)}
+                        />
+                    )}
+
+                    <DeleteIcon
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => handleConfirmDialogOpen(params.id)}
+                    />
+                </>
+                );
             },
         },
     ];
@@ -113,11 +161,11 @@ const HomePage: React.FC = () => {
         setSelectedId(id);
         setConfirmDialogOpen(true);
         setDescription('您確定要刪除這個帳號嗎？');
-        setConfirmTitle('刪除打卡帳號');
+        setConfirmTitle('刪除系統帳號');
     }
 
     const handleDelete = (id: GridRowId) => {
-        api.delete(`/check-in-accounts/${id}`, config)
+        api.delete(`/admins/${id}`, config)
             .then((response) => {
                 console.log("刪除成功", response.data)
                 setSnackbarOpen(true)
@@ -128,11 +176,11 @@ const HomePage: React.FC = () => {
                     case 422:
                         showSnackbar("warning", "請輸入正確資料")
                         break
-                    case 400:
-                        showSnackbar("error", "打卡帳號刪除失敗，請確認帳號是否存在")
-                        break
                     case 403:
                         showSnackbar("warning", "權限錯誤")
+                        break
+                    case 400:
+                        showSnackbar("error", "系統帳號刪除失敗，請確認帳號是否存在")
                         break
                     case 500:
                         showSnackbar("error", "伺服器錯誤請聯繫，開發人員")
@@ -149,40 +197,24 @@ const HomePage: React.FC = () => {
         }
     };
 
-    const handleOpen = (data?: CheckInAccount) => {
-        if (data) {
-            setFormTitle("修改打卡帳號")
-            setDataToPass(data);
-            setFormDialogOpen(true);
-        } else {
-            setDataToPass(undefined);
-        }
-        setFormDialogOpen(true);
-    };
-    const handleFormDialogClose = () => setFormDialogOpen(false);
     const handleConfirmDialogClose = () => setConfirmDialogOpen(false);
 
-    const handleAddNew = () => {
-        setFormTitle("新增打卡帳號")
-        setDataToPass(undefined);
-        setFormDialogOpen(true);
-    };
     const onLogout = () => {
         localStorage.clear()
         navigate('/')
     }
     React.useEffect(() => {
-        api.get("/check-in-accounts", config)
+        api.get("/admins", config)
             .then((response) => {
-                const formattedData = response.data.map((item: CheckInAccount) => {
+                const formattedData = response.data.map((item: Admin) => {
                     const camelCaseItem = _.mapKeys(item, (value, key) => _.camelCase(key));
-                    return { ...camelCaseItem, id: camelCaseItem.id };
+                    return { ...camelCaseItem, id: camelCaseItem.id, originalRole: camelCaseItem.role };
                 });
 
-                setCheckInAccountData(formattedData);
+                setAdminData(formattedData);
             }).catch(error => {
                 if (error.response.status === 404) {
-                    setCheckInAccountData([])
+                    setAdminData([])
                     return
                 }
                 console.log(error)
@@ -205,16 +237,7 @@ const HomePage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            {role === "admin" && <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />}
-            <FormDialog
-                title={formTitle}
-                open={formDialogOpen}
-                handleClose={handleFormDialogClose}
-                data={dataToPass}
-                boolean={boolean}
-                setBoolean={setBoolean}
-                showSnackbar={showSnackbar}
-            />
+            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />
             <ConfirmDialog
                 title={confirmTitle}
                 open={confirmDialogOpen}
@@ -222,13 +245,8 @@ const HomePage: React.FC = () => {
                 description={description}
                 handleConfirm={handleConfirmDelete}
             />
-            <Box m={2} mx={4}> {/* m = margin */}
-                <Button variant="contained" color="primary" onClick={handleAddNew}>
-                    新增打卡帳號
-                </Button>
-            </Box>
             <Box mt={4} mx={4}>
-                <DataTable rows={checkInAccountData}
+                <DataTable rows={adminData}
                     columns={columns}
                     paginationModel={{ page: 0, pageSize: 5 }}
                     pageSizeOptions={[5, 10]}
@@ -238,4 +256,4 @@ const HomePage: React.FC = () => {
     )
 }
 
-export default HomePage
+export default AdminPage
