@@ -205,7 +205,7 @@ const HomePage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            {role === "admin" && <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />}
+            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />
             <FormDialog
                 title={formTitle}
                 open={formDialogOpen}
