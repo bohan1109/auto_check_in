@@ -30,11 +30,17 @@ async def close_mongo_connection():
 async def main():
     logger.info("Script started!")
     await connect_to_mongo()
+    current_time = datetime.now()
+
+    hours = current_time.hour
+    minutes = current_time.minute
+
+    formatted_time = f"{hours:02d}:{minutes:02d}"
     collection = db.check_in_accounts
     logger.info("Fetching check-in accounts...")
-    check_in_accounts = await collection.find().to_list(length=1000)
+    check_in_accounts = await collection.find({"check_in_time":formatted_time}).to_list(length=1000)
     logger.info(f"Found {len(check_in_accounts)} check-in accounts.")
-    holiday_list = [
+    no_check_in_holidays = [
         datetime(2024, 1, 1).date(),
         datetime(2024, 2, 8).date(),
         datetime(2024, 2, 9).date(),
@@ -48,14 +54,14 @@ async def main():
         datetime(2024, 9, 17).date(),
         datetime(2024, 10, 10).date(),
     ]
-    workday_list=[
+    holiday_check_in_days=[
         datetime(2024, 2, 17).date(),
         
     ]
     current_date = datetime.now().date()
-    if current_date.weekday() <= 4 or current_date in workday_list:
+    if current_date.weekday() <= 4 or current_date in holiday_check_in_days:
         check_in(check_in_accounts)
-    elif current_date in holiday_list:
+    elif current_date in no_check_in_holidays:
         check_in(check_in_accounts)
 
     # check_in_crawler = CheckInCrawler()
