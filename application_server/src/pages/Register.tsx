@@ -79,8 +79,10 @@ const RegisterPage: React.FC = () => {
         })
             .then((response) => {
                 const jwtToken = response.data.access_token
-                localStorage.setItem('jwtToken', jwtToken); 
-                setTimeout(()=>{navigate('/home')},900) 
+                localStorage.setItem('jwtToken', jwtToken);
+                getTokenContent()
+                showSnackbar("success", "登入成功")
+                setTimeout(() => { navigate('/home') }, 900) 
                 
             }).catch((error) => {
                 switch (error.response.status){
@@ -95,6 +97,24 @@ const RegisterPage: React.FC = () => {
                         break
                 }
             })
+    }
+
+    const getTokenContent = () => {
+        const jwtToken = localStorage.getItem("jwtToken")
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`
+                    },
+                }
+        api.get('/admins/protected', config)
+        .then((response)=>{
+            const responseData = response.data
+            localStorage.setItem('username', responseData.username);
+            localStorage.setItem('role', responseData.role);
+            localStorage.setItem('account', responseData.account);
+        }).catch(()=>{
+            showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
+        })
     }
 
     return (<>
