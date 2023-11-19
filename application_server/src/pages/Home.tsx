@@ -9,7 +9,6 @@ import FormDialog from "../components/FormDialog";
 import Snackbar from "../components/Snackbar"
 import AppBar from "../components/AppBar"
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useNavigate } from 'react-router-dom';
 import _ from 'lodash';
 const HomePage: React.FC = () => {
     interface CheckInAccount {
@@ -22,7 +21,6 @@ const HomePage: React.FC = () => {
         checkOutTime: string;
         owner: string;
     }
-    const navigate = useNavigate();
     const [checkInAccountData, setCheckInAccountData] = React.useState<CheckInAccount[]>([])
     const [dataToPass, setDataToPass] = React.useState<CheckInAccount | undefined>()
     const [boolean, setBoolean] = React.useState(true)
@@ -37,7 +35,6 @@ const HomePage: React.FC = () => {
     const [formTitle, setFormTitle] = React.useState('')
     const username = localStorage.getItem("username") || "使用者"
     const jwtToken = localStorage.getItem("jwtToken")
-    const role = localStorage.getItem("role")!
     const config = {
         headers: {
             Authorization: `Bearer ${jwtToken}`
