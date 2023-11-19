@@ -7,7 +7,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import Snackbar from "../components/Snackbar"
 import AppBar from "../components/AppBar"
 import ConfirmDialog from "../components/ConfirmDialog";
-import { useNavigate } from 'react-router-dom';
 import CheckIcon from '@mui/icons-material/Check';
 import _ from 'lodash';
 const AdminPage: React.FC = () => {
@@ -19,7 +18,6 @@ const AdminPage: React.FC = () => {
         role: string
         originalRole?: string;
     }
-    const navigate = useNavigate();
     const [adminData, setAdminData] = React.useState<Admin[]>([])
     const [boolean, setBoolean] = React.useState(true)
     const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
@@ -31,7 +29,6 @@ const AdminPage: React.FC = () => {
     const [snackDescription, setSnackDescription] = React.useState('')
     const [unsavedRoles, setUnsavedRoles] = React.useState<Set<GridRowId>>(new Set());
     const username = localStorage.getItem("username") || "使用者"
-    const role = localStorage.getItem("role")!
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
