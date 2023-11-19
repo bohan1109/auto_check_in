@@ -26,7 +26,8 @@ echo "set-timezone Asia/Taipei"
 
 sudo docker image prune -a -f
 echo "remove idle images"
-
+crontab -r
+echo "remove crontab"
 for i in {30..55..5}; do
     CRON_JOB="$i 8 * * * docker exec api_server_web_1 python /usr/src/backend/check_in_script.py"
     if ! crontab -l 2>/dev/null | grep -qF "$CRON_JOB"; then
