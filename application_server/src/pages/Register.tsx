@@ -3,6 +3,7 @@ import api from '../Axios.config'
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from "../components/Snackbar"
+import {TokenContext} from "../App"
 import _ from 'lodash';
 const RegisterPage: React.FC = () => {
     const [account, setAccount] = React.useState('');
@@ -13,7 +14,13 @@ const RegisterPage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
     const navigate = useNavigate();
+    const context = React.useContext(TokenContext);
 
+    if (!context) {
+        return null; 
+    }
+
+    const { setRole } = context;
     const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUsername(e.target.value);
     };
@@ -112,6 +119,7 @@ const RegisterPage: React.FC = () => {
             localStorage.setItem('username', responseData.username);
             localStorage.setItem('role', responseData.role);
             localStorage.setItem('account', responseData.account);
+            setRole(responseData.role)
         }).catch(()=>{
             showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
         })

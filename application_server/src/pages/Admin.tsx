@@ -234,7 +234,7 @@ const AdminPage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            <AppBar title='自動打卡系統' username={username} role={role} />
+            <AppBar title='自動打卡系統' username={username} />
             <ConfirmDialog
                 title={confirmTitle}
                 open={confirmDialogOpen}

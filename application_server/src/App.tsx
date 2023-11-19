@@ -14,6 +14,8 @@ import AdminRoute from './components/AdminRoute';
 type TokenContextType = {
   tokenContext: string | null;
   setTokenContext: React.Dispatch<React.SetStateAction<string | null>>;
+  role: string | null;
+  setRole: React.Dispatch<React.SetStateAction<string | null>>;
 };
 
 export const TokenContext = React.createContext<TokenContextType | null>(null);
@@ -22,12 +24,14 @@ const App: React.FC = () => {
   const [tokenContext, setTokenContext] = React.useState(
     localStorage.getItem("jwtToken")
   );
-  const role = localStorage.getItem("role")
+  const [role, setRole] = React.useState(localStorage.getItem("role"));
   
   const providerValue = React.useMemo(() => ({
     tokenContext,
-    setTokenContext
-  }), [tokenContext]);
+    setTokenContext,
+    role,
+    setRole
+  }), [tokenContext, role]);
 
   return (
     <TokenContext.Provider value={providerValue}>

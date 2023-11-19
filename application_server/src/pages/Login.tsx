@@ -3,6 +3,7 @@ import api from '../Axios.config'
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from "../components/Snackbar"
+import {TokenContext} from "../App"
 const LoginPage: React.FC = () => {
     const [account, setAccount] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -10,13 +11,21 @@ const LoginPage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
     const navigate = useNavigate();
-
     React.useEffect(() => {
         const token = localStorage.getItem('jwtToken');
         if (token) {
             navigate('/home');
         }
     }, [navigate]);
+    const context = React.useContext(TokenContext);
+
+    if (!context) {
+        return null; 
+    }
+
+    const { setRole } = context;
+
+
     const handleAccount = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAccount(e.target.value);
     };
@@ -75,6 +84,7 @@ const LoginPage: React.FC = () => {
             localStorage.setItem('username', responseData.username);
             localStorage.setItem('role', responseData.role);
             localStorage.setItem('account', responseData.account);
+            setRole(responseData.role)
         }).catch(()=>{
             showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
         })
