@@ -3,6 +3,7 @@ import api from '../Axios.config'
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from "../components/Snackbar"
+import {TokenContext} from "../App"
 import _ from 'lodash';
 const RegisterPage: React.FC = () => {
     const [account, setAccount] = React.useState('');
@@ -13,7 +14,13 @@ const RegisterPage: React.FC = () => {
     const [snackbarSeverity, setSnackbarSeverity] = React.useState<"error" | "warning" | "info" | "success">("success")
     const [snackDescription, setSnackDescription] = React.useState('')
     const navigate = useNavigate();
+    const context = React.useContext(TokenContext);
 
+    if (!context) {
+        return null; 
+    }
+
+    const { setRole } = context;
     const handleUsername = (e: React.ChangeEvent<HTMLInputElement>) => {
         setUsername(e.target.value);
     };
@@ -79,8 +86,10 @@ const RegisterPage: React.FC = () => {
         })
             .then((response) => {
                 const jwtToken = response.data.access_token
-                localStorage.setItem('jwtToken', jwtToken); 
-                setTimeout(()=>{navigate('/home')},900) 
+                localStorage.setItem('jwtToken', jwtToken);
+                getTokenContent()
+                showSnackbar("success", "登入成功")
+                setTimeout(() => { navigate('/home') }, 900) 
                 
             }).catch((error) => {
                 switch (error.response.status){
@@ -95,6 +104,25 @@ const RegisterPage: React.FC = () => {
                         break
                 }
             })
+    }
+
+    const getTokenContent = () => {
+        const jwtToken = localStorage.getItem("jwtToken")
+                const config = {
+                    headers: {
+                        Authorization: `Bearer ${jwtToken}`
+                    },
+                }
+        api.get('/admins/protected', config)
+        .then((response)=>{
+            const responseData = response.data
+            localStorage.setItem('username', responseData.username);
+            localStorage.setItem('role', responseData.role);
+            localStorage.setItem('account', responseData.account);
+            setRole(responseData.role)
+        }).catch(()=>{
+            showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
+        })
     }
 
     return (<>

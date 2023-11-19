@@ -1,22 +1,34 @@
-import React from 'react';
+import React,{useContext} from 'react';
 import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import {TokenContext} from "../App"
 interface AppBarProps {
     title: string;
-    onLogout: () => void;
     username:string
-    role?:string
 }
 
 
 
-const CustomAppBar: React.FC<AppBarProps> = ({ title, onLogout,username,role }) => {
+const CustomAppBar: React.FC<AppBarProps> = ({ title,username }) => {
     const navigate = useNavigate();
+    const context = useContext(TokenContext);
+
+    if (!context) {
+        return null; 
+    }
+
+const { setTokenContext, role, setRole } = context;
     const navigateAdminPage = ()=>{
         navigate('/admin')
     }
     const navigateHomePage = ()=>{
         navigate('/home')
+    }
+    const onLogout = () => {
+        localStorage.clear()
+        setTokenContext(null);
+        setRole(null);
+        navigate('/')
     }
     return (
         <AppBar position="static">
