@@ -199,10 +199,7 @@ const AdminPage: React.FC = () => {
 
     const handleConfirmDialogClose = () => setConfirmDialogOpen(false);
 
-    const onLogout = () => {
-        localStorage.clear()
-        navigate('/')
-    }
+
     React.useEffect(() => {
         api.get("/admins", config)
             .then((response) => {
@@ -237,7 +234,7 @@ const AdminPage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />
+            <AppBar title='自動打卡系統' username={username} role={role} />
             <ConfirmDialog
                 title={confirmTitle}
                 open={confirmDialogOpen}

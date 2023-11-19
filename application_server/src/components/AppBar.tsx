@@ -3,20 +3,23 @@ import { AppBar, Toolbar, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 interface AppBarProps {
     title: string;
-    onLogout: () => void;
     username:string
     role?:string
 }
 
 
 
-const CustomAppBar: React.FC<AppBarProps> = ({ title, onLogout,username,role }) => {
+const CustomAppBar: React.FC<AppBarProps> = ({ title,username,role }) => {
     const navigate = useNavigate();
     const navigateAdminPage = ()=>{
         navigate('/admin')
     }
     const navigateHomePage = ()=>{
         navigate('/home')
+    }
+    const onLogout = () => {
+        localStorage.clear()
+        navigate('/')
     }
     return (
         <AppBar position="static">

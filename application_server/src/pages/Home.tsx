@@ -167,10 +167,7 @@ const HomePage: React.FC = () => {
         setDataToPass(undefined);
         setFormDialogOpen(true);
     };
-    const onLogout = () => {
-        localStorage.clear()
-        navigate('/')
-    }
+
     React.useEffect(() => {
         api.get("/check-in-accounts", config)
             .then((response) => {
@@ -205,7 +202,7 @@ const HomePage: React.FC = () => {
     return (
         <>
             <Snackbar severity={snackbarSeverity} open={snackbarOpen} description={snackDescription} handleClose={handleSnackbarClose} />
-            <AppBar title='自動打卡系統' onLogout={onLogout} username={username} role={role} />
+            <AppBar title='自動打卡系統' username={username} role={role} />
             <FormDialog
                 title={formTitle}
                 open={formDialogOpen}
