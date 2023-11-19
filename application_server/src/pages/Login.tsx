@@ -49,6 +49,10 @@ const LoginPage: React.FC = () => {
         api.post("/admins/login", {
             account: account,
             password: password
+        },{
+            headers: {
+                'isLoginRequest': true
+            }
         })
             .then((response) => {
                 const jwtToken = response.data.access_token
