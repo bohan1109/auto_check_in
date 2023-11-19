@@ -11,12 +11,17 @@ const instance = axios.create({
 instance.interceptors.response.use(
     response => response,
     error => {
-        if (error.response && error.response.status === 401) {
-            localStorage.removeItem("jwtToken");
-            window.location.href = '/';
-        } else {
-            return Promise.reject(error);
+        if (error.response) {
+            const status = error.response.status;
+            const isLoginRequest = error.config.headers['isLoginRequest'];
+
+            if (status === 401 && !isLoginRequest) {
+                localStorage.removeItem("jwtToken");
+                window.location.href = '/';
+            }
         }
+
+        return Promise.reject(error);
     }
 );
 
