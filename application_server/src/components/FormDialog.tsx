@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Select, MenuItem, InputLabel } from '@mui/material';
 import api from '../Axios.config'
 import _ from 'lodash';
 import Loading from './Loading';
@@ -25,8 +25,8 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const [checkInPassword, setCheckInPassword] = useState('');
     const [checkInUsername, setCheckInUsername] = useState(data?.checkInUsername || '');
     const [loading, setLoading] = useState(false);
-    const [checkInTime, setCheckInTime] = useState(data?.checkInTime||'08:30');
-    const [checkOutTime, setCheckOutTime] = useState(data?.checkOutTime||'18:05');
+    const [checkInTime, setCheckInTime] = useState(data?.checkInTime || '08:30');
+    const [checkOutTime, setCheckOutTime] = useState(data?.checkOutTime || '18:05');
 
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
@@ -48,7 +48,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
     const editData = () => {
         setLoading(true)
-        
+
         const updateData = {
             checkInAccount: checkInAccount,
             checkInPassword: checkInPassword,
@@ -129,46 +129,46 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             })
     }
 
-    const createTimeOptions = (startHour:number, startMinute:number, endHour:number, endMinute:number, interval:number) => {
+    const createTimeOptions = (startHour: number, startMinute: number, endHour: number, endMinute: number, interval: number) => {
         let times = [];
         let currentTime = new Date(0, 0, 0, startHour, startMinute, 0);
-    
+
         while (currentTime.getHours() < endHour || (currentTime.getHours() === endHour && currentTime.getMinutes() <= endMinute)) {
             let time = currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
             times.push(time);
             currentTime = new Date(currentTime.getTime() + interval * 60000);
         }
-    
+
         return times;
     };
-    
+
     const checkInTimes = createTimeOptions(8, 30, 9, 0, 5);
     const checkOutTimes = createTimeOptions(18, 0, 18, 30, 5);
     const handleSave = () => {
 
         if (data) {
             const isDataUnchanged = data &&
-            checkInAccount === data.checkInAccount &&
-            checkInUsername === data.checkInUsername &&
-            checkInTime === data.checkInTime &&
-            checkOutTime === data.checkOutTime;
-    
-        if (isDataUnchanged) {
-            handleClose();
-            return;
-        }
+                checkInAccount === data.checkInAccount &&
+                checkInUsername === data.checkInUsername &&
+                checkInTime === data.checkInTime &&
+                checkOutTime === data.checkOutTime;
+
+            if (isDataUnchanged) {
+                handleClose();
+                return;
+            }
             editData();
             console.log("update")
         } else {
-            const isDataIncomplete = 
-            checkInAccount === "" &&
-            checkInPassword === "" &&
-            checkInUsername === "";
-        
-        if (isDataIncomplete) {
-            handleClose();
-            return;
-        }
+            const isDataIncomplete =
+                checkInAccount === "" &&
+                checkInPassword === "" &&
+                checkInUsername === "";
+
+            if (isDataIncomplete) {
+                handleClose();
+                return;
+            }
             console.log("create")
             createData();
         }
@@ -204,23 +204,23 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     value={checkInPassword}
                     onChange={(e) => setCheckInPassword(e.target.value)}
                 />
+                <InputLabel id="check-in-time-label" style={{ marginTop: '16px' }}>打卡上班時間</InputLabel>
                 <Select
                     value={checkInTime}
                     onChange={(e) => setCheckInTime(e.target.value)}
                     fullWidth
                     margin="dense"
-                    style={{ marginTop: '16px' }}
                 >
                     {checkInTimes.map(time => (
                         <MenuItem key={time} value={time}>{time}</MenuItem>
                     ))}
                 </Select>
+                <InputLabel id="check-out-time-label" style={{ marginTop: '16px' }}>打卡下班時間</InputLabel>
                 <Select
                     value={checkOutTime}
                     onChange={(e) => setCheckOutTime(e.target.value)}
                     fullWidth
                     margin="dense"
-                    style={{ marginTop: '16px' }}
                 >
                     {checkOutTimes.map(time => (
                         <MenuItem key={time} value={time}>{time}</MenuItem>
