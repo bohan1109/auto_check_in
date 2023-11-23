@@ -30,6 +30,17 @@ class TestAdminService(unittest.IsolatedAsyncioTestCase):
         admins = await self.admin_service.fetch_admins()
         self.assertEqual(admins, mock_admins_data)
 
+    async def test_fetch_admin_by_account(self):
+        mock_admins_data={
+                "_id": "some-fake-id-1",
+                "account": "admin_account",
+                "password": "hashedpassword",
+                "username": "Admin User",
+                "role": "admin",
+        }
+        self.mock_db.read_admin_by_params = AsyncMock(return_value=mock_admins_data)
+        admin = await self.admin_service.fetch_admin_by_account("admin_account")
+        self.assertEqual(admin, mock_admins_data)
 
 if __name__ == "__main__":
     unittest.main()
