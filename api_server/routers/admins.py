@@ -29,7 +29,7 @@ async def read_protected_route(current_admin: admins_model.TokenData = Depends(g
 @router.get("/{admin_id}")
 async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
-        admin_data =await admins_service.fetch_admin(admin_id)
+        admin_data =await admins_service.fetch_admin_by_id(admin_id)
         if admin_data is None:
             raise HTTPException(status_code=404, detail="Data not found")
         return admin_data
