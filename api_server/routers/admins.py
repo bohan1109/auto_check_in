@@ -74,8 +74,11 @@ async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_serv
     try:
         if admin.role and current_admin.role!="admin":
             raise HTTPException(status_code=403, detail="Permission denied")
-        await admins_service.update_admin(admin_id,admin)
-        return {"detail": "success"}
+        result = await admins_service.update_admin(admin_id,admin)
+        if result is False:
+            raise ValueError("Data can not be empty")
+        else:
+            return {"detail": "success"}
     except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
