@@ -120,6 +120,12 @@ class TestAdminService(unittest.IsolatedAsyncioTestCase):
         await self.admin_service.update_admin("admin_id", mock_admin_update)
 
         self.mock_db.update_admin.assert_not_called()
+        
+    async def test_delete_admin(self):
+        mock_admin_id="admin_id"
+        self.mock_db.delete_admin=AsyncMock()
+        await self.admin_service.delete_admin(mock_admin_id)
+        self.mock_db.delete_admin.assert_called_with(mock_admin_id)
 
 
 
