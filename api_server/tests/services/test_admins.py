@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import AsyncMock, patch
 from services.admins import AdminService
-from models.admins import AdminCreate
-
+from models.admins import AdminCreate,AdminUpdate,Role
+from unittest.mock import ANY
 
 class TestAdminService(unittest.IsolatedAsyncioTestCase):
     @patch("db.admins.AdminDB")
@@ -80,6 +80,47 @@ class TestAdminService(unittest.IsolatedAsyncioTestCase):
         self.mock_db.create_admin = AsyncMock(return_value="admin_created")
         result = await self.admin_service.create_admin(mock_admin)
         self.assertEqual(result, "admin_created")
+    
+    async def test_update_admin_password(self):
+        mock_admin_update = AdminUpdate(password="new_password", confirm_password="new_password")
+        self.mock_db.update_admin = AsyncMock()
+
+        await self.admin_service.update_admin("admin_id", mock_admin_update)
+
+        self.mock_db.update_admin.assert_called_with("admin_id", {"password": ANY})
+        
+    async def test_update_admin_role(self):
+        mock_admin_update = AdminUpdate(role=Role.ADMIN)
+        self.mock_db.update_admin = AsyncMock()
+
+        await self.admin_service.update_admin("admin_id", mock_admin_update)
+
+        self.mock_db.update_admin.assert_called_with("admin_id", {"role": mock_admin_update.role})
+        
+    async def test_update_admin_username(self):
+        mock_admin_update = AdminUpdate(username="new_username")
+        self.mock_db.update_admin = AsyncMock()
+
+        await self.admin_service.update_admin("admin_id", mock_admin_update)
+
+        self.mock_db.update_admin.assert_called_with("admin_id", {"username": mock_admin_update.username})
+
+    async def test_update_admin_multiple_fields(self):
+        mock_admin_update = AdminUpdate(password="new_password", confirm_password="new_password", username="new_username")
+        self.mock_db.update_admin = AsyncMock()
+
+        await self.admin_service.update_admin("admin_id", mock_admin_update)
+
+        self.mock_db.update_admin.assert_called_with("admin_id", {"password": ANY, "username": "new_username"})
+
+    async def test_update_admin_no_change(self):
+        mock_admin_update = AdminUpdate()
+        self.mock_db.update_admin = AsyncMock()
+
+        await self.admin_service.update_admin("admin_id", mock_admin_update)
+
+        self.mock_db.update_admin.assert_not_called()
+
 
 
 if __name__ == "__main__":
