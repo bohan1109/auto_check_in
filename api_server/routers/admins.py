@@ -29,7 +29,7 @@ async def read_protected_route(current_admin: admins_model.TokenData = Depends(g
 @router.get("/{admin_id}")
 async def read_admin(admin_id: str,admins_service: AdminServiceModule.AdminService = Depends(get_admins_service),current_admin: admins_model.TokenData = Depends(get_current_admin)):
     try:
-        admin_data =await admins_service.fetch_admin(admin_id)
+        admin_data =await admins_service.fetch_admin_by_id(admin_id)
         if admin_data is None:
             raise HTTPException(status_code=404, detail="Data not found")
         return admin_data
@@ -74,8 +74,11 @@ async def update_admin(admin_id: str,admin: admins_model.AdminUpdate,admins_serv
     try:
         if admin.role and current_admin.role!="admin":
             raise HTTPException(status_code=403, detail="Permission denied")
-        await admins_service.update_admin(admin_id,admin)
-        return {"detail": "success"}
+        result = await admins_service.update_admin(admin_id,admin)
+        if result is None:
+            raise ValueError("Data can not be empty")
+        else:
+            return {"detail": "success"}
     except ValueError as ve:  
         logger.warning(f"Value error encountered: {str(ve)}")
         raise HTTPException(status_code=400, detail=str(ve))
