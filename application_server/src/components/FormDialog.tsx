@@ -38,6 +38,8 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
         if (data?.id) {
             setCheckInAccount(data.checkInAccount);
             setCheckInUsername(data.checkInUsername);
+            setCheckInTime(data.checkInTime)
+            setCheckOutTime(data.checkOutTime)
         } else {
             setCheckInAccount('');
             setCheckInPassword('');
