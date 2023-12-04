@@ -2,7 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import AsyncMock, patch
 from services.check_in_accounts import CheckInAccountService
-from models.check_in_accounts import CheckInAccountCreate
+from models.check_in_accounts import CheckInAccountCreate, CheckInAccountUpdate
 from unittest.mock import ANY
 
 
@@ -53,8 +53,8 @@ class TestCheckInAccountService(unittest.IsolatedAsyncioTestCase):
     async def test_create_check_in_account_login_success(self, mock_crawler_cls):
         mock_check_in_account = CheckInAccountCreate(
             # 需改成登入帳號及密碼才能成功運行
-            check_in_account="check_in_account",
-            check_in_password="check_in_password",
+            check_in_account="0012",
+            check_in_password="N126277085",
             check_in_username="check_in_username",
             owner="admin_account",
             check_in_time="check_in_time",
@@ -74,6 +74,28 @@ class TestCheckInAccountService(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual(result, "check_in_account_created")
 
+    async def test_update_check_in_account_existing_account_error(self):
+        self.mock_db.read_check_in_account_by_params = AsyncMock(
+            return_value={
+                "_id": "some_other_id",
+                "check_in_account": "existing_account",
+            }
+        )
+
+        update_data = CheckInAccountUpdate(
+            check_in_account="existing_account",
+        )
+
+        with self.assertRaises(ValueError):
+            await self.check_in_account_service.update_check_in_account(
+                "current_id", update_data
+            )
+
+        self.mock_db.read_check_in_account_by_params.assert_called_with(
+            "check_in_account", "existing_account"
+        )
+
+    
     async def test_delete_check_in_account(self):
         mock_check_in_account_id="check_in_account_id"
         self.mock_db.delete_check_in_account=AsyncMock()
