@@ -7,4 +7,23 @@ Auto Check-In 是一款自動化打卡系統，允許使用者透過網頁輸入
 - 網頁：提供簡潔直觀的網頁，方便使用者輸入及查看資料。
 - 資料庫整合：系統與資料庫緊密整合，確保資料的安全儲存與快速存取。
 
+## 技術
 
+- **前端：**
+  - React Ts
+  - Material-UI
+
+- **後端：**
+  - Python
+  - Selenium
+  - FastAPI
+
+- **資料庫：**
+  - Mongodb
+
+- **其他工具：**
+  - Docker
+  - Aws EC2
+  - Nginx
+  - Git
+  - Github Action
