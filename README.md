@@ -44,7 +44,7 @@ Auto Check-In 是一款自動化打卡系統，允許使用者透過網頁輸入
 
 ### 前置要求
 - 必須是 Linux 系統。
-- 需安裝Docker、Node.js、npm。
+- 需安裝Docker、Node.js、npm( setup.sh 會在linux系統中安裝好docker，其餘兩個需要自行安裝)。
 
 ### Step1：下載檔案
 ```bash
@@ -57,7 +57,7 @@ Auto Check-In 是一款自動化打卡系統，允許使用者透過網頁輸入
 ### Step3：安裝前端依賴、建立靜態檔案
 1. 在前端目錄下運行以下指令
 ```bash
-cd ./auto_check_in/application_server
+cd auto_check_in/application_server
 npm install
 ```
 2. 建立靜態
