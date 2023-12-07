@@ -57,10 +57,12 @@ Auto Check-In 是一款自動化打卡系統，允許使用者透過網頁輸入
 ### Step3：安裝前端依賴、建立靜態檔案
 1. 在前端目錄下運行以下指令
 ```bash
+#進入前端目錄
 cd auto_check_in/application_server
+#執行以下指令安裝前端依賴
 npm install
 ```
-2. 建立靜態
+2. 建立前端靜態檔案
 ```bash
 npm run build
 ```
