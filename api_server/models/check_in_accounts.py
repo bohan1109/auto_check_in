@@ -25,3 +25,5 @@ class CheckInAccountUpdate(BaseModel):
     check_in_username: Optional[str] = None
     check_in_time:Optional[str] = None
     check_out_time:Optional[str] = None
+    use_random_check_in:Optional[bool] = None
+    
