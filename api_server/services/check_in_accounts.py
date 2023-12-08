@@ -43,14 +43,7 @@ class CheckInAccountService:
         crawler_instance = CheckInCrawler()
         account_data_dict = check_in_account.dict()
 
-        password_changed = False  
-        if account_data_dict['check_in_password'] == "":
-            account_data_dict.pop('check_in_password', None) 
-            account_data_dict.pop('login_success', None) 
-        else:
-            password_changed = True 
-
-        if password_changed:
+        if check_in_account.check_in_password is not None:
             login_model = check_in_accounts_models.CheckInAccountUpdate(**account_data_dict)
             login_success = crawler_instance.login_result(login_model)
             encryption = Encryption()
@@ -60,6 +53,7 @@ class CheckInAccountService:
                 account_data_dict['login_success'] = True  
             else:
                 return False 
+        account_data_dict = {k: v for k, v in check_in_account.dict().items() if v is not None}
         result = await self._check_in_account_db.update_check_in_account(check_in_account_id,account_data_dict)
         return result
     
