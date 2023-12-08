@@ -47,6 +47,12 @@ for i in {0..30..5}; do
     fi
 done
 
+CRON_JOB_RANDOMIZE="0 0 * * * docker exec api_server_web_1 python /usr/src/backend/randomized_check_in_times.py"
+if ! crontab -l 2>/dev/null | grep -qF "$CRON_JOB_RANDOMIZE"; then
+    (crontab -l 2>/dev/null; echo "$CRON_JOB_RANDOMIZE") | crontab -
+fi
+
+
 echo "set crontap"
 
 echo "Setup completed."
