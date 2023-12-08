@@ -94,6 +94,29 @@ AES_KEY = b'SWKQc1xRzNpN2LfmKOsyyIdNvU_3V-a1zBuGzcJ-ooo='
 ### Step5：配置Nginx
 配置 Nginx 以便正確地代理請求到您的應用程式。
 配置須包含前端、後端。
+以下是nginx範例
+```
+server {
+    listen 80;
+    server_name example.com;
+
+    # 前端靜態檔案配置
+    location / {
+        root /path/to/auto_check_in/application_server/build;
+        try_files $uri /index.html;
+    }
+
+    # API 代理配置
+    location /api {
+        proxy_pass http://localhost:8001; # docker 運行後端服務運行在 8001 端口
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
 
 ### 初始登入系統
 系統初始登錄的帳號和密碼均設為 admin。
