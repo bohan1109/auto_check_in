@@ -42,8 +42,7 @@ class CheckInAccountService:
                 raise ValueError("Check in account already exist")
         crawler_instance = CheckInCrawler()
         account_data_dict = check_in_account.dict()
-
-        if check_in_account.check_in_password is not None:
+        if check_in_account.check_in_password != "":
             login_model = check_in_accounts_models.CheckInAccountUpdate(**account_data_dict)
             login_success = crawler_instance.login_result(login_model)
             encryption = Encryption()
@@ -53,7 +52,7 @@ class CheckInAccountService:
                 account_data_dict['login_success'] = True  
             else:
                 return False 
-        account_data_dict = {k: v for k, v in check_in_account.dict().items() if v is not None}
+        account_data_dict = {k: v for k, v in check_in_account.dict().items() if v is not None and v != ""}
         result = await self._check_in_account_db.update_check_in_account(check_in_account_id,account_data_dict)
         return result
     
