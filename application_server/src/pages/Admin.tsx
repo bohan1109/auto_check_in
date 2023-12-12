@@ -65,8 +65,6 @@ const AdminPage: React.FC = () => {
                     setBoolean(!boolean)
                 })
                 .catch((error) => {
-                    console.log(error.response.status)
-                    console.log(error.response.data.detail)
                     switch (error.response.status) {
                         case 400:
                             showSnackbar("error", "更新失敗");
@@ -164,7 +162,6 @@ const AdminPage: React.FC = () => {
     const handleDelete = (id: GridRowId) => {
         api.delete(`/admins/${id}`, config)
             .then((response) => {
-                console.log("刪除成功", response.data)
                 setSnackbarOpen(true)
                 showSnackbar("success", "刪除成功")
                 setBoolean(!boolean)

@@ -16,6 +16,7 @@ const HomePage: React.FC = () => {
         loginSuccess: boolean;
         checkInAccount: string;
         checkInPassword: string;
+        useRandomCheckIn:boolean;
         checkInUsername: string;
         checkInTime: string;
         checkOutTime: string;
@@ -72,6 +73,11 @@ const HomePage: React.FC = () => {
             width: 120,
         },
         {
+            field: 'useRandomCheckIn',
+            headerName: '自動更新打卡時間',
+            width: 180,
+        },
+        {
             field: 'action',
             headerName: '操作',
             sortable: false,
@@ -97,7 +103,7 @@ const HomePage: React.FC = () => {
                     return null;
                 }
             },
-        },
+        }
     ];
 
     const showSnackbar = (severity: "error" | "warning" | "info" | "success", message: string) => {
@@ -116,7 +122,6 @@ const HomePage: React.FC = () => {
     const handleDelete = (id: GridRowId) => {
         api.delete(`/check-in-accounts/${id}`, config)
             .then((response) => {
-                console.log("刪除成功", response.data)
                 setSnackbarOpen(true)
                 showSnackbar("success", "刪除成功")
                 setBoolean(!boolean)

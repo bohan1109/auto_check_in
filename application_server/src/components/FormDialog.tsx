@@ -3,6 +3,9 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, S
 import api from '../Axios.config'
 import _ from 'lodash';
 import Loading from './Loading';
+import DescriptionDialog from './DescriptionDialog'
+import ErrorIcon from '@mui/icons-material/Error';
+import { red } from '@mui/material/colors';
 interface FormDialogProps {
     title: string;
     data?: {
@@ -12,6 +15,7 @@ interface FormDialogProps {
         checkInUsername: string;
         checkInTime: string;
         checkOutTime: string;
+        useRandomCheckIn: boolean;
     };
     open: boolean;
     handleClose: () => void;
@@ -27,7 +31,8 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     const [loading, setLoading] = useState(false);
     const [checkInTime, setCheckInTime] = useState(data?.checkInTime || '08:30');
     const [checkOutTime, setCheckOutTime] = useState(data?.checkOutTime || '18:05');
-
+    const [useRandomCheckIn, setUseRandomCheckIn] = useState(data?.useRandomCheckIn || false);
+    const [descriptionDialogOpen, setDescriptionDialogOpen] = useState(false)
     const jwtToken = localStorage.getItem("jwtToken")
     const config = {
         headers: {
@@ -40,10 +45,12 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             setCheckInUsername(data.checkInUsername);
             setCheckInTime(data.checkInTime)
             setCheckOutTime(data.checkOutTime)
+            setUseRandomCheckIn(data.useRandomCheckIn)
         } else {
             setCheckInAccount('');
             setCheckInPassword('');
             setCheckInUsername('');
+            setUseRandomCheckIn(false);
         }
     }, [data]);
 
@@ -57,6 +64,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             checkInUsername: checkInUsername,
             checkInTime: checkInTime,
             checkOutTime: checkOutTime,
+            useRandomCheckIn: useRandomCheckIn
         }
         const formattedData = _.mapKeys(updateData, (value, key) => _.snakeCase(key));
         api.patch(`/check-in-accounts/${data?.id}`, formattedData, config)
@@ -101,6 +109,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             checkInUsername: checkInUsername,
             checkInTime: checkInTime,
             checkOutTime: checkOutTime,
+            useRandomCheckIn: useRandomCheckIn
         }
         const formattedData = _.mapKeys(createData, (value, key) => _.snakeCase(key));
         api.post(`/check-in-accounts`, formattedData, config)
@@ -143,6 +152,12 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
         return times;
     };
+    const handleOpenDescriptionDialog = () => {
+        setDescriptionDialogOpen(true)
+    }
+    const handleDescriptionDialogClose = ()=>{
+        setDescriptionDialogOpen(false)
+    }
 
     const checkInTimes = createTimeOptions(8, 30, 9, 0, 5);
     const checkOutTimes = createTimeOptions(18, 0, 18, 30, 5);
@@ -153,6 +168,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 checkInAccount === data.checkInAccount &&
                 checkInUsername === data.checkInUsername &&
                 checkInTime === data.checkInTime &&
+                useRandomCheckIn === data.useRandomCheckIn &&
                 checkOutTime === data.checkOutTime;
 
             if (isDataUnchanged) {
@@ -160,7 +176,6 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 return;
             }
             editData();
-            console.log("update")
         } else {
             const isDataIncomplete =
                 checkInAccount === "" &&
@@ -171,13 +186,18 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 handleClose();
                 return;
             }
-            console.log("create")
             createData();
         }
     };
 
 
-    return (
+    return (<>
+        <DescriptionDialog 
+        title="自動更換打卡時間功能介紹" 
+        open={descriptionDialogOpen} 
+        handleClose={handleDescriptionDialogClose} 
+        description="自動更換打卡時間設定為True的話，會每天打卡時間進行隨機更換，設定成False的話，則會是固定選擇的時段，並不會做更換。" 
+        />
         <Dialog open={open} onClose={handleClose}>
             <Loading loading={loading} />
             <DialogTitle >{title}</DialogTitle>
@@ -206,7 +226,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     value={checkInPassword}
                     onChange={(e) => setCheckInPassword(e.target.value)}
                 />
-                <InputLabel id="check-in-time-label" style={{ marginTop: '16px' }}>打卡上班時間</InputLabel>
+                <InputLabel id="check-in-time-label" style={{ marginTop: '9px' }}>打卡上班時間</InputLabel>
                 <Select
                     value={checkInTime}
                     onChange={(e) => setCheckInTime(e.target.value)}
@@ -217,7 +237,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                         <MenuItem key={time} value={time}>{time}</MenuItem>
                     ))}
                 </Select>
-                <InputLabel id="check-out-time-label" style={{ marginTop: '16px' }}>打卡下班時間</InputLabel>
+                <InputLabel id="check-out-time-label" style={{ marginTop: '9px' }}>打卡下班時間</InputLabel>
                 <Select
                     value={checkOutTime}
                     onChange={(e) => setCheckOutTime(e.target.value)}
@@ -228,6 +248,27 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                         <MenuItem key={time} value={time}>{time}</MenuItem>
                     ))}
                 </Select>
+                <InputLabel id="check-out-time-label" style={{ marginTop: '9px' }}>
+                    自動更換打卡時間
+                    <ErrorIcon
+                        fontSize="small"
+                        style={{
+                            color: red[500],
+                            position: 'relative',
+                            top: '4px'
+                        }}
+                        onClick={handleOpenDescriptionDialog}
+                    />
+                </InputLabel>
+                <Select
+                    value={useRandomCheckIn.toString()}
+                    onChange={(e) => setUseRandomCheckIn(e.target.value === "true")}
+                    fullWidth
+                    margin="dense"
+                >
+                    <MenuItem value={"true"}>True</MenuItem>
+                    <MenuItem value={"false"}>False</MenuItem>
+                </Select>
 
 
             </DialogContent>
@@ -236,7 +277,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 <Button onClick={handleSave}>確認</Button>
             </DialogActions>
         </Dialog>
-    );
+    </>);
 }
 
 export default FormDialog;
