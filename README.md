@@ -89,7 +89,11 @@ python key_manager.py
 AES_KEY = b'SWKQc1xRzNpN2LfmKOsyyIdNvU_3V-a1zBuGzcJ-ooo='
 ```
 1. 運行docker ps，查看 python 的 container name，並將 setup.sh 內的crontab指令中 api_server_web_1 改為container name
-2. 重新運行setup.sh
+2. 將setup.sh內的crontab腳本時間改為需要的時間
+   1. check_in_script.py 是上班打卡腳本
+   2. check_out_script.py 是下班打卡腳本
+   3. randomized_check_in_times.py 是自動更換上下班時間的打卡腳本
+3. 重新運行setup.sh
 
 ### Step5：配置Nginx
 配置 Nginx 以便正確地代理請求到您的應用程式。
