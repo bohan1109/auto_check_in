@@ -40,7 +40,7 @@ if ! crontab -l 2>/dev/null | grep -qF "$CRON_JOB"; then
     (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
 fi
 
-for i in {0..30..5}; do
+for i in {0..25..5}; do
     CRON_JOB="$i 18 * * * docker exec api_server_web_1 python /usr/src/backend/check_out_script.py"
     if ! crontab -l 2>/dev/null | grep -qF "$CRON_JOB"; then
         (crontab -l 2>/dev/null; echo "$CRON_JOB") | crontab -
