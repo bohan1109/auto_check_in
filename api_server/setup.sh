@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e
-
+mkdir -p /home/ubuntu/auto_check_in/api_server/logs
 echo "Updating system..."
 sudo apt-get update
 
@@ -52,7 +52,12 @@ if ! crontab -l 2>/dev/null | grep -qF "$CRON_JOB_RANDOMIZE"; then
     (crontab -l 2>/dev/null; echo "$CRON_JOB_RANDOMIZE") | crontab -
 fi
 
+CRON_JOB_CHECK_IN="3 9 * * * docker exec api_server_web_1 python /usr/src/backend/check_in_script.py >> /home/ubuntu/auto_check_in/api_server/logs/check_in.log 2>&1"
+(crontab -l 2>/dev/null; echo "$CRON_JOB_CHECK_IN") | crontab -
 
-echo "set crontap"
+CRON_JOB_CHECK_OUT="30 18 * * * docker exec api_server_web_1 python /usr/src/backend/check_out_script.py >> /home/ubuntu/auto_check_in/api_server/logs/check_out.log 2>&1"
+(crontab -l 2>/dev/null; echo "$CRON_JOB_CHECK_OUT") | crontab -
+
+echo "set crontap completed"
 
 echo "Setup completed."
