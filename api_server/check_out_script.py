@@ -75,8 +75,8 @@ async def main():
     logger.info("Script finished successfully!")
 
 def check_in(check_in_accounts:dist):
-    check_in_crawler = CheckInCrawler()
     for idx, check_in_account in enumerate(check_in_accounts):
+        check_in_crawler = CheckInCrawler()
         logger.info(f"Processing account {idx+1}...")
         check_in_crawler.check_in(check_in_account)
 
