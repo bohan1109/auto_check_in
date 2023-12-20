@@ -160,7 +160,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
     }
 
     const checkInTimes = createTimeOptions(8, 30, 9, 0, 5);
-    const checkOutTimes = createTimeOptions(18, 0, 18, 30, 5);
+    const checkOutTimes = createTimeOptions(18, 0, 18, 25, 5);
     const handleSave = () => {
 
         if (data) {

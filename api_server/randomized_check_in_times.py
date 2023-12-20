@@ -43,7 +43,7 @@ async def update_random_times():
 
     for account in random_check_in_accounts:
         random_check_in_time = generate_random_time("08:30", "09:00", 5)
-        random_check_out_time = generate_random_time("18:00", "18:30", 5)
+        random_check_out_time = generate_random_time("18:00", "18:25", 5)
 
         await collection.update_one(
             {"_id": account['_id']},
