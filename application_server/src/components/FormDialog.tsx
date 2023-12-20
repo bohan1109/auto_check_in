@@ -207,14 +207,14 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     fullWidth
                     label="使用者"
                     value={checkInUsername}
-                    onChange={(e) => setCheckInUsername(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCheckInUsername(e.target.value)}
                 />
                 <TextField
                     margin="normal"
                     fullWidth
                     label="打卡帳號"
                     value={checkInAccount}
-                    onChange={(e) => setCheckInAccount(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCheckInAccount(e.target.value)}
                     disabled={!!data}
                 // {!!data}等於{data?true:false}
                 />
@@ -224,7 +224,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                     type="password"
                     label="密碼"
                     value={checkInPassword}
-                    onChange={(e) => setCheckInPassword(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCheckInPassword(e.target.value)}
                 />
                 <InputLabel id="check-in-time-label" style={{ marginTop: '9px' }}>打卡上班時間</InputLabel>
                 <Select
