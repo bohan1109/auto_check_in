@@ -84,7 +84,9 @@ async def patch_check_in_account(
 ):
     try:
         check_in_account_data =await check_in_accounts_service.fetch_check_in_account_by_id(check_in_account_id)
-        if check_in_account_data['owner'] != current_admin.account or current_admin.role!="admin":
+        print(current_admin)
+        print(check_in_account_data['owner'])
+        if check_in_account_data['owner'] != current_admin.account and current_admin.role!="admin":
             raise HTTPException(status_code=403, detail="Permission denied")
         result = await check_in_accounts_service.update_check_in_account(check_in_account_id,check_in_account)
         if not result:
