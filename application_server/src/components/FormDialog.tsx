@@ -116,6 +116,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
             .then((response) => {
                 showSnackbar("success", "打卡帳號新增成功")
                 setBoolean(!boolean)
+                resetFormState()
                 handleClose()
             }).catch((error) => {
                 const detail = error.response.data.detail
@@ -161,6 +162,20 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
     const checkInTimes = createTimeOptions(8, 30, 9, 0, 5);
     const checkOutTimes = createTimeOptions(18, 0, 18, 25, 5);
+    const resetFormState = () => {
+        setCheckInAccount('');
+        setCheckInPassword('');
+        setCheckInUsername('');
+        setCheckInTime('08:30');
+        setCheckOutTime('18:05');
+        setUseRandomCheckIn(false);
+    };
+    const updatedHandleClose = ()=>{
+        if(!data){
+            resetFormState()
+        }
+        handleClose()
+    }
     const handleSave = () => {
 
         if (data) {
@@ -187,6 +202,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
                 return;
             }
             createData();
+            
         }
     };
 
@@ -273,7 +289,7 @@ const FormDialog: React.FC<FormDialogProps> = ({ title, data, open, handleClose,
 
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleClose}>取消</Button>
+                <Button onClick={updatedHandleClose}>取消</Button>
                 <Button onClick={handleSave}>確認</Button>
             </DialogActions>
         </Dialog>
