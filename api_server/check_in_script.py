@@ -59,10 +59,12 @@ async def main():
         
     ]
     current_date = datetime.now().date()
-    if current_date.weekday() <= 4 or current_date in holiday_check_in_days:
+    if current_date in no_check_in_holidays:
+        logger.info("Today is a holiday, no check-in.")
+    elif current_date.weekday() <= 4 or current_date in holiday_check_in_days or current_date in make_up_work_days:
         check_in(check_in_accounts)
-    elif current_date in no_check_in_holidays:
-        check_in(check_in_accounts)
+    else:
+        logger.info("Today is not a check-in day.")
 
     # check_in_crawler = CheckInCrawler()
     
