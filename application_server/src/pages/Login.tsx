@@ -3,7 +3,7 @@ import api from '../Axios.config'
 import { TextField, Button, Grid, Typography, Paper } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from "../components/Snackbar"
-import {TokenContext} from "../App"
+import { TokenContext } from "../App"
 const LoginPage: React.FC = () => {
     const [account, setAccount] = React.useState('');
     const [password, setPassword] = React.useState('');
@@ -20,7 +20,7 @@ const LoginPage: React.FC = () => {
     const context = React.useContext(TokenContext);
 
     if (!context) {
-        return null; 
+        return null;
     }
 
     const { setRole } = context;
@@ -45,11 +45,16 @@ const LoginPage: React.FC = () => {
             setSnackbarOpen(false);
         }
     };
+
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); 
+        handelLoginButton(); 
+    };
     const handelLoginButton = () => {
         api.post("/admins/login", {
             account: account,
             password: password
-        },{
+        }, {
             headers: {
                 'isLoginRequest': true
             }
@@ -77,21 +82,21 @@ const LoginPage: React.FC = () => {
     }
     const getTokenContent = () => {
         const jwtToken = localStorage.getItem("jwtToken")
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${jwtToken}`
-                    },
-                }
+        const config = {
+            headers: {
+                Authorization: `Bearer ${jwtToken}`
+            },
+        }
         api.get('/admins/protected', config)
-        .then((response)=>{
-            const responseData = response.data
-            localStorage.setItem('username', responseData.username);
-            localStorage.setItem('role', responseData.role);
-            localStorage.setItem('account', responseData.account);
-            setRole(responseData.role)
-        }).catch(()=>{
-            showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
-        })
+            .then((response) => {
+                const responseData = response.data
+                localStorage.setItem('username', responseData.username);
+                localStorage.setItem('role', responseData.role);
+                localStorage.setItem('account', responseData.account);
+                setRole(responseData.role)
+            }).catch(() => {
+                showSnackbar("error", "伺服器錯誤，請聯繫開發人員")
+            })
     }
     const handelRegisterButton = () => {
         navigate('/register');
@@ -104,6 +109,7 @@ const LoginPage: React.FC = () => {
                     <Typography variant="h4" gutterBottom align="center">
                         零次方自動打卡系統
                     </Typography>
+                    <form onSubmit={handleFormSubmit}>
                     <TextField
                         label="帳號"
                         variant="outlined"
@@ -119,9 +125,10 @@ const LoginPage: React.FC = () => {
                         type="password"
                         onChange={handlePassword}
                     />
-                    <Button variant="contained" color="primary" style={{ marginTop: '10px' }} fullWidth onClick={handelLoginButton}>
+                    <Button type="submit" variant="contained" color="primary" style={{ marginTop: '10px' }} fullWidth onClick={handelLoginButton}>
                         登入
                     </Button>
+                    </form>
                     <Button variant="contained" color="primary" style={{ marginTop: '10px' }} fullWidth onClick={handelRegisterButton}>
                         註冊
                     </Button>
